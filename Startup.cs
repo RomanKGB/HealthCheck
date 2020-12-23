@@ -28,7 +28,7 @@ namespace HealthCheck
             });
 
             services.AddHealthChecks()
-                .AddCheck("ICMP_01", new ICMPHealthCheck("www.ryadel.com", 100))
+                .AddCheck("ICMP_01", new ICMPHealthCheck("www.nb.com", 100))
                 .AddCheck("ICMP_02", new ICMPHealthCheck("www.google.com", 100))
                 .AddCheck("ICMP_03", new ICMPHealthCheck("www.does-not-exist.com", 100));
         }
