@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using HealthCheck.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthCheck
 {
@@ -27,6 +29,11 @@ namespace HealthCheck
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            services.AddEntityFrameworkSqlServer();
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
             services.AddHealthChecks()
                 .AddCheck("ICMP_01", new ICMPHealthCheck("www.nb.com", 100))
                 .AddCheck("ICMP_02", new ICMPHealthCheck("www.google.com", 100))
