@@ -10,6 +10,8 @@ import { HomeComponent } from './home/home.component';
 import { HealthCheckComponent } from './health-check/health-check.component';
 import { CitiesComponent } from './cities/cities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AngularMaterialModule } from './angular-material.module';
+
 
 @NgModule({
     declarations: [
@@ -29,7 +31,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
           { path: 'cities', component: CitiesComponent }
 
         ]),
-        BrowserAnimationsModule
+      BrowserAnimationsModule,
+      AngularMaterialModule
     ],
     providers: [],
     bootstrap: [AppComponent]

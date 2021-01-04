@@ -10,6 +10,7 @@ import { City } from './city';
 })
 
 export class CitiesComponent {
+  public displayedColumns: string[] = ['id', 'name', 'lat', 'lon'];
   public cities: City[];
 
   constructor(
