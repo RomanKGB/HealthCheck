@@ -8,13 +8,15 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { HealthCheckComponent } from './health-check/health-check.component';
+import { CitiesComponent } from './cities/cities.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         NavMenuComponent,
         HomeComponent,
-        HealthCheckComponent
+        HealthCheckComponent,
+        CitiesComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -22,7 +24,9 @@ import { HealthCheckComponent } from './health-check/health-check.component';
         FormsModule,
         RouterModule.forRoot([
             { path: '', component: HomeComponent, pathMatch: 'full' },
-            { path: 'health-check', component: HealthCheckComponent }
+          { path: 'health-check', component: HealthCheckComponent },
+          { path: 'cities', component: CitiesComponent }
+
         ])
     ],
     providers: [],
