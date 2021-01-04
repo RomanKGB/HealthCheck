@@ -9,6 +9,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { HealthCheckComponent } from './health-check/health-check.component';
 import { CitiesComponent } from './cities/cities.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
@@ -27,7 +28,8 @@ import { CitiesComponent } from './cities/cities.component';
           { path: 'health-check', component: HealthCheckComponent },
           { path: 'cities', component: CitiesComponent }
 
-        ])
+        ]),
+        BrowserAnimationsModule
     ],
     providers: [],
     bootstrap: [AppComponent]
