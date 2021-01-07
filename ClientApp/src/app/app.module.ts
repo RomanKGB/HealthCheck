@@ -9,6 +9,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { HealthCheckComponent } from './health-check/health-check.component';
 import { CitiesComponent } from './cities/cities.component';
+import { CountriesComponent } from './countries/countries.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
 
@@ -19,7 +20,8 @@ import { AngularMaterialModule } from './angular-material.module';
         NavMenuComponent,
         HomeComponent,
         HealthCheckComponent,
-        CitiesComponent
+        CitiesComponent,
+        CountriesComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -28,7 +30,8 @@ import { AngularMaterialModule } from './angular-material.module';
         RouterModule.forRoot([
             { path: '', component: HomeComponent, pathMatch: 'full' },
           { path: 'health-check', component: HealthCheckComponent },
-          { path: 'cities', component: CitiesComponent }
+          { path: 'cities', component: CitiesComponent },
+          { path: 'countries', component: CountriesComponent }
 
         ]),
       BrowserAnimationsModule,
