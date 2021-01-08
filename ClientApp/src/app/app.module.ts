@@ -12,6 +12,7 @@ import { CitiesComponent } from './cities/cities.component';
 import { CountriesComponent } from './countries/countries.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import { AngularMaterialModule } from './angular-material.module';
 
         ]),
       BrowserAnimationsModule,
-      AngularMaterialModule
+      AngularMaterialModule,
+      ReactiveFormsModule
     ],
     providers: [],
     bootstrap: [AppComponent]

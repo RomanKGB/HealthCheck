@@ -69,7 +69,7 @@ namespace HealthCheck.Data
         {
             var prop = typeof(T).GetProperty(
                 propertyName,
-                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static|BindingFlags.Instance);
+                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
             if (prop == null && throwExceptionIfNotFound)
                 throw new NotSupportedException(String.Format("ERROR:Property {0} not found", propertyName));
