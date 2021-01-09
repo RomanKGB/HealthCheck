@@ -9,6 +9,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { HealthCheckComponent } from './health-check/health-check.component';
 import { CitiesComponent } from './cities/cities.component';
+import { CityEditComponent } from './cities/city-edit.component';
 import { CountriesComponent } from './countries/countries.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
@@ -22,6 +23,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
         HomeComponent,
         HealthCheckComponent,
         CitiesComponent,
+        CityEditComponent,
         CountriesComponent
     ],
     imports: [
@@ -32,6 +34,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
             { path: '', component: HomeComponent, pathMatch: 'full' },
           { path: 'health-check', component: HealthCheckComponent },
           { path: 'cities', component: CitiesComponent },
+          { path: 'city/:id', component: CityEditComponent },
           { path: 'countries', component: CountriesComponent }
 
         ]),

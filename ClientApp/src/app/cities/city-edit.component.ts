@@ -28,6 +28,7 @@ export class CityEditComponent {
       lat: new FormControl(''),
       lon: new FormControl('')
     });
+    this.loadData();
   }
     loadData(){
       var id = this.activatedRoute.snapshot.paramMap.get('id');
