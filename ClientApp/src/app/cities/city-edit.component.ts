@@ -43,8 +43,8 @@ export class CityEditComponent {
     onSubmit(){
       var city = this.city;
       city.name = this.form.get("name").value;
-      city.lon = this.form.get("lon").value;
-      city.lat = this.form.get("lat").value;
+      city.lon = +this.form.get("lon").value;
+      city.lat = +this.form.get("lat").value;
 
       var url = this.baseUrl + "api/cities/" + this.city.id;
       this.http
