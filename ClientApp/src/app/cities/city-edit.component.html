@@ -10,7 +10,12 @@
       <label for="name">City name:</label>
       <br />
       <input type="text" id="name" formControlName="name" required placeholder="City name..." class="form-control" />
-
+      <div *ngIf="form.get('name').invalid &&
+           (form.get('name').dirty || form.get('name').touched)" class="invalid-feedback">
+        <div *ngIf="form.get('name').errors?.required">
+          Name is required
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
@@ -18,7 +23,15 @@
       <label for="lat">City latitude:</label>
       <br />
       <input type="text" id="lat" formControlName="lat" required placeholder="City latitude..." class="form-control" />
-
+      <div *ngIf="form.get('lat').invalid &&
+           (form.get('lat').dirty || form.get('lat').touched)" class="invalid-feedback">
+        <div *ngIf="form.get('lat').errors?.required">
+          Latitude is required 
+        </div>
+        <div *ngIf="form.get('lat').errors?.pattern">
+          Latitude should be numeric
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
@@ -26,12 +39,20 @@
       <label for="lon">City longtitude:</label>
       <br />
       <input type="text" id="lon" formControlName="lon" required placeholder="City longtitude..." class="form-control" />
-
+      <div *ngIf="form.get('lon').invalid &&
+           (form.get('lon').dirty || form.get('lon').touched)" class="invalid-feedback">
+        <div *ngIf="form.get('lon').errors?.required">
+          Longtitude is required
+        </div>
+        <div *ngIf="form.get('lon').errors?.pattern">
+          Longtitude should be numeric
+        </div>
+      </div>
     </div>
 
     <div class="form-group" *ngIf="countries">
       <label for="countryId">Country</label>
-      <br/>
+      <br />
       <mat-form-field *ngIf="countries">
         <mat-label>Select a country...</mat-label>
         <mat-select id="countryId" formControlName="countryId">
@@ -40,11 +61,17 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <div *ngIf="form.get('countryId').invalid &&
+           (form.get('countryId').dirty || form.get('countryId').touched)" class="invalid-feedback">
+        <div *ngIf="form.get('countryId').errors?.required">
+          Country is required
+        </div>
+      </div>
     </div>
 
     <div class="form-group-commands">
-      <button *ngIf="id" type="submit" (click)="onSubmit()" class="btn-success">Save City</button>
-      <button *ngIf="!id" type="submit" (click)="onSubmit()" class="btn-success">Create City</button>
+      <button *ngIf="id" type="submit" (click)="onSubmit()" [disabled]="form.invalid" class="btn-success">Save City</button>
+      <button *ngIf="!id" type="submit" (click)="onSubmit()" [disabled]="form.invalid" class="btn-success">Create City</button>
       <button type="submit" [routerLink]="['/cities']" class="btn-primary btn-default">Cancel</button>
     </div>
 

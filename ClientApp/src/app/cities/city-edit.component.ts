@@ -1,7 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+
 import { City } from './city';
 import { Country } from './../countries/country';
 
@@ -27,11 +28,11 @@ export class CityEditComponent {
 
   ngOnInit() {
     this.form = new FormGroup({
-      name: new FormControl(''),
-      lat: new FormControl(''),
-      lon: new FormControl(''),
-      countryId: new FormControl('')
-    });
+      name: new FormControl('', Validators.required),
+      lat: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$")]),
+      lon: new FormControl('', [Validators.required,Validators.pattern("^[0-9]*$")]),
+      countryId: new FormControl('', Validators.required)
+    }, null);
     this.loadData();
   }
   loadData() {
@@ -54,6 +55,8 @@ export class CityEditComponent {
       
       
   }
+
+  isDupeCity() { return false; }
 
   loadCountries() {
     var url = this.baseUrl + "api/countries";
