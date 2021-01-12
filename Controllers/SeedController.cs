@@ -76,7 +76,7 @@ namespace HealthCheck.Controllers
                         var countryName = row[nRow, 5].GetValue<string>();
                         var country = lstCountries.Where(c => c.Name == countryName).FirstOrDefault();
 
-                        city.CountryID = country.Id;
+                        city.CountryId = country.Id;
 
                         _context.Cities.Add(city);
                         await _context.SaveChangesAsync();

@@ -22,7 +22,7 @@ namespace HealthCheck.Data.Models
         [Column(TypeName = "decimal(7,4)")]
         public decimal Lon { get; set; }
         [ForeignKey("Country")]
-        public int CountryID { get; set; }
+        public int CountryId { get; set; }
 
         public virtual Country Country { get; set; }
     }

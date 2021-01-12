@@ -2,6 +2,12 @@
 <p>Here is a list of cities</p>
 <p *ngIf="!cities"><em>Loading cities...</em></p>
 
+<div class="commands text-right" *ngIf="cities">
+  <button type="button"
+          [routerLink]="['/city']"
+          class="btn-success">Add a new city</button>
+</div>
+
 <mat-form-field [hidden]="!cities">
   <input matInput (keyup)="loadData($event.target.value)" placeholder="Filter by city name, or part of it" />
 </mat-form-field>
