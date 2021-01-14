@@ -1,7 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl, AsyncValidatorFn } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { City } from './city';
 import { Country } from './../countries/country';
@@ -29,12 +31,34 @@ export class CityEditComponent {
   ngOnInit() {
     this.form = new FormGroup({
       name: new FormControl('', Validators.required),
-      lat: new FormControl('', [Validators.required, Validators.pattern("^[0-9]*$")]),
-      lon: new FormControl('', [Validators.required,Validators.pattern("^[0-9]*$")]),
+      lat: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
+      lon: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
       countryId: new FormControl('', Validators.required)
-    }, null);
+    }, null, this.isDupeCity());
     this.loadData();
   }
+
+  isDupeCity(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
+
+      var city = <City>{};
+      city.id = (this.id) ? this.id : 0;
+      city.name = this.form.get("name").value;
+      city.lat = +this.form.get("lat").value;
+      city.lon = +this.form.get("lon").value;
+      city.countryId = +this.form.get("countryId").value;
+
+      var url = this.baseUrl + "api/cities/IsDupeCity";
+      console.log(url);
+      return this.http.post<boolean>(url, city).pipe(map(result => {
+
+        return (result ? { isDupeCity: true } : null);
+      }));
+    }
+  }
+
+
+
   loadData() {
     this.loadCountries();
     this.id = +this.activatedRoute.snapshot.paramMap.get('id');
@@ -56,7 +80,7 @@ export class CityEditComponent {
       
   }
 
-  isDupeCity() { return false; }
+
 
   loadCountries() {
     var url = this.baseUrl + "api/countries";
