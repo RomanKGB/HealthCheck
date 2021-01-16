@@ -22,7 +22,19 @@ namespace HealthCheck.Data.Models
         public string ISO2 { get; set; }
         [JsonPropertyName("iso3")]
         public string ISO3 { get; set; }
-
+        [JsonIgnore]
         public virtual List<City> Cities { get; set; }
+        [NotMapped]
+        public int TotalCities
+        {
+            get
+            {
+                return (Cities != null) ? Cities.Count : _TotCities;
+            }
+            set { _TotCities = value; }
+        }
+
+        private int _TotCities = 0;
+
     }
 }
