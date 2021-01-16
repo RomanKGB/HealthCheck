@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 
 import { City } from './city';
 import { Country } from './../countries/country';
+import { BaseFormComponent } from '../base.form.component';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { Country } from './../countries/country';
   templateUrl: './city-edit.component.html',
   styleUrls: ['./city-edit.component.css']
 })
-export class CityEditComponent {
+export class CityEditComponent extends BaseFormComponent {
   title: string;
   form: FormGroup;
   city: City;
@@ -26,7 +27,7 @@ export class CityEditComponent {
     private router: Router,
     private http: HttpClient,
     @Inject('BASE_URL') private baseUrl: string
-  ) { }
+  ) { super(); }
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -119,6 +120,28 @@ export class CityEditComponent {
           }, error => console.error(error));
       }
       
-    }
+  }
+
+
+  /*NO LONGER NEED THESE SINCE THEY WILL COME FROM BASE CLASS
+   * getControl(name: string) {
+    return this.form.get(name);
+  }
+
+  isValid(name: string) {
+    var e = this.getControl(name);
+    return e && e.valid;
+  }
+
+  isChanged(name: string) {
+    var e = this.getControl(name);
+    return e && (e.dirty || e.touched);
+  }
+
+  hasError(name: string) {
+    var e = this.getControl(name);
+    return e && (e.dirty || e.touched) && e.invalid;
+  }*/
+
   }
 

@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Country } from './../countries/country';
 import { error } from '@angular/compiler/src/util';
+import { BaseFormComponent } from '../base.form.component';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { error } from '@angular/compiler/src/util';
   styleUrls: ['./country-edit.component.css']
 })
 
-export class CountryEditComponent {
+export class CountryEditComponent extends BaseFormComponent {
   title: string;
   form: FormGroup;
   country: Country;
@@ -27,6 +28,7 @@ export class CountryEditComponent {
     private router: Router,
     private http: HttpClient,
     @Inject('BASE_URL') private baseUrl: string) {
+    super();
     this.loadData();
   }
 
