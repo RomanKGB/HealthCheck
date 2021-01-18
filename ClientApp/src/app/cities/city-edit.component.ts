@@ -24,6 +24,7 @@ export class CityEditComponent extends BaseFormComponent {
   city: City;
   id?: number;
   countries: Country[];
+  activityLog: string = '';
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -38,8 +39,34 @@ export class CityEditComponent extends BaseFormComponent {
       lon: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
       countryId: new FormControl('', Validators.required)
     }, null, this.isDupeCity());
+
+    this.form.valueChanges
+      .subscribe(val => {
+        if (!this.form.dirty) {
+          this.log("Form model has been loaded.");
+        }
+        else {
+          this.log("Form was updated by the user.");
+        }
+      });
+
+    this.form.get("name")!.valueChanges
+      .subscribe(val => {
+        if (!this.form.dirty) {
+          this.log("Name has been loaded with initial values");
+        }
+        else {
+          this.log("Name was updated by the user");
+        }
+      });
+
     this.loadData();
   }
+
+  log(str: string) {
+    this.activityLog += "[" + new Date().toLocaleString() + "]" + str + "<br/>";
+  }
+
 
   isDupeCity(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {

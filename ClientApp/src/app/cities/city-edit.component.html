@@ -76,3 +76,29 @@
     </div>
 
   </div>
+
+<div class="card bg-light bm-3">
+  <div class="card-header">Form Debug Infor</div>
+  <div class="card-body">
+    <div class="card-text">
+      <div><strong>Form value:</strong></div>
+      <div class="help-block">
+        {{form.value | json }}
+      </div>
+      <div class="mt2"><strong>Form status:</strong></div>
+      <div class="help-block">
+        {{form.status | json }}
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="card bg-light mb-3">
+    <div class="card-header">Form Activity Log</div>
+    <div class="card-body">
+      <div class="card-text">
+        <div class="help-block">
+          <span *ngIf="activityLog" [innerHTML]="activityLog"></span>
+        </div>
+      </div>
+    </div>
+  </div>

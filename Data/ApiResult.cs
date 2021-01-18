@@ -60,6 +60,11 @@ namespace HealthCheck.Data
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize);
 
+#if DEBUG
+            {
+                var sql = source.ToSql();
+            }
+#endif
             var data = await source.ToListAsync();
 
             return new ApiResult<T>(data, count, pageIndex, pageSize,sortColumn,sortOrder,filterColumn,filterQuery);
