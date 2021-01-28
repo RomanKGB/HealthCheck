@@ -10,6 +10,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using HealthCheck.Data.Models;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthCheck.Controllers
 {
@@ -18,10 +19,18 @@ namespace HealthCheck.Controllers
     public class SeedController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
-        public SeedController(ApplicationDbContext context,IWebHostEnvironment env)
+        public SeedController(
+            ApplicationDbContext context,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            IWebHostEnvironment env)
         {
             _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
             _env = env;
         }
 
@@ -86,6 +95,12 @@ namespace HealthCheck.Controllers
                     return new JsonResult(new { Cities = nCities, Countries = nCountries });
                 }
             }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> CreateDefaultUsers()
+        {
+            throw new NotImplementedException();
         }
     }
 }
