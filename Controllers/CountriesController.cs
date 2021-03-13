@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthCheck.Data;
 using HealthCheck.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthCheck.Controllers
 {
@@ -60,6 +61,7 @@ namespace HealthCheck.Controllers
             return country;
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(int id,Country country)
         {
@@ -79,7 +81,7 @@ namespace HealthCheck.Controllers
 
             return NoContent();
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Country>> PostCountry(Country country)
         {
@@ -90,6 +92,7 @@ namespace HealthCheck.Controllers
         }
 
         // DELETE: api/Countries/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Country>> DeleteCountry(int id)
         {

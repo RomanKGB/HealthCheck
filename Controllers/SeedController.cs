@@ -100,7 +100,71 @@ namespace HealthCheck.Controllers
         [HttpGet]
         public async Task<ActionResult> CreateDefaultUsers()
         {
-            throw new NotImplementedException();
+
+            string role_RegisteredUser = "RegisteredUser";
+            string role_Administrator = "Administrator";
+
+            if (await _roleManager.FindByNameAsync(role_RegisteredUser) ==
+                null)
+                await _roleManager.CreateAsync(new IdentityRole(role_RegisteredUser));
+
+            if (await _roleManager.FindByNameAsync(role_Administrator) ==
+                null)
+                await _roleManager.CreateAsync(new IdentityRole(role_Administrator));
+
+            var addedUserList = new List<ApplicationUser>();
+
+            var email_admin = "admin@email.com";
+            if(await _userManager.FindByEmailAsync(email_admin)==null)
+            {
+                var user_Admin = new ApplicationUser()
+                {
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = email_admin,
+                    Email = email_admin,
+                };
+
+                await _userManager.CreateAsync(user_Admin, "MySecr3t$");
+
+                await _userManager.AddToRoleAsync(user_Admin, role_RegisteredUser);
+                await _userManager.AddToRoleAsync(user_Admin, role_Administrator);
+
+                user_Admin.EmailConfirmed = true;
+                user_Admin.LockoutEnabled = false;
+
+                addedUserList.Add(user_Admin);
+            }
+
+            var email_user = "user@email.com";
+            if (await _userManager.FindByEmailAsync(email_user) == null)
+            {
+                var user_User = new ApplicationUser()
+                {
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = email_user,
+                    Email = email_user,
+                };
+
+                await _userManager.CreateAsync(user_User, "MySecr3t$");
+
+                await _userManager.AddToRoleAsync(user_User, role_RegisteredUser);
+                //await _userManager.AddToRoleAsync(user_User, role_Administrator);
+
+                user_User.EmailConfirmed = true;
+                user_User.LockoutEnabled = false;
+
+                addedUserList.Add(user_User);
+            }
+
+            if (addedUserList.Count > 0) await _context.SaveChangesAsync();
+
+            return new JsonResult(new
+            {
+                Count = addedUserList.Count,
+                Users=addedUserList,
+                SomeOtherBullshit="Huinia"
+            });
+
         }
     }
 }

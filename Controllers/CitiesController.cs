@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthCheck.Data;
 using HealthCheck.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthCheck.Controllers
 {
@@ -62,6 +63,7 @@ namespace HealthCheck.Controllers
         // PUT: api/Cities/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCity(int id, City city)
         {
@@ -94,6 +96,7 @@ namespace HealthCheck.Controllers
         // POST: api/Cities
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<City>> PostCity(City city)
         {
@@ -104,6 +107,7 @@ namespace HealthCheck.Controllers
         }
 
         // DELETE: api/Cities/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<City>> DeleteCity(int id)
         {

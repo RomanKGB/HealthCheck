@@ -16,6 +16,11 @@ import { CountryEditComponent } from './countries/country-edit.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
+import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
+import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
+import { CityService } from './cities/city.service';
+import { CountryService } from './countries/country.service';
 
 
 @NgModule({
@@ -33,23 +38,23 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
         HttpClientModule,
-        FormsModule,
+      FormsModule,
+      ApiAuthorizationModule,
         RouterModule.forRoot([
             { path: '', component: HomeComponent, pathMatch: 'full' },
           { path: 'health-check', component: HealthCheckComponent },
           { path: 'cities', component: CitiesComponent },
-          { path: 'city/:id', component: CityEditComponent },
-          { path: 'city', component: CityEditComponent },
+          { path: 'city/:id', component: CityEditComponent, canActivate: [AuthorizeGuard] },
+          { path: 'city', component: CityEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'countries', component: CountriesComponent },
-          { path: 'country/:id', component: CountryEditComponent },
-          { path: 'country', component: CountryEditComponent }
-
+          { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
+          { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] }
         ]),
       BrowserAnimationsModule,
       AngularMaterialModule,
       ReactiveFormsModule
-    ],
-    providers: [],
+  ],
+  providers: [CityService, CountryService, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor,multi:true }],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
