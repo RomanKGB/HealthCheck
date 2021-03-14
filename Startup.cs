@@ -10,6 +10,7 @@ using HealthCheck.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace HealthCheck
 {
@@ -78,6 +79,12 @@ namespace HealthCheck
             }
 
             app.UseHttpsRedirection();
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".webmanifest"] = "application/manifest+json";
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ContentTypeProvider = provider
+            });
             app.UseStaticFiles(new StaticFileOptions()
             {
                 OnPrepareResponse = (context) =>
@@ -93,7 +100,10 @@ namespace HealthCheck
             });
             if (!env.IsDevelopment())
             {
-                app.UseSpaStaticFiles();
+                app.UseSpaStaticFiles(new StaticFileOptions()
+                {
+                    ContentTypeProvider = provider
+                });
             }
 
             app.UseRouting();
