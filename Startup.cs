@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -78,10 +79,23 @@ namespace HealthCheck
             }
 
             app.UseHttpsRedirection();
+            // add .webmanifest MIME-type support
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".webmanifest"] = "application/manifest+json";
+
             app.UseStaticFiles(new StaticFileOptions()
             {
+                ContentTypeProvider=provider,
                 OnPrepareResponse = (context) =>
                 {
+                    
+                    if (context.File.Name == "isOnline.txt")
+                    {
+                        context.Context.Response.Headers.Add("Cache-control", "no-cache,no-store");
+                        context.Context.Response.Headers.Add("Expires", "-1");
+                    }
+                    else
+                    { 
                     // Retrieve cache configuration from appsettings.json
                     context.Context.Response.Headers["Cache-Control"] =
                         Configuration["StaticFiles:Headers:Cache-Control"];
@@ -89,11 +103,15 @@ namespace HealthCheck
                         Configuration["StaticFiles:Headers:Pragma"];
                     context.Context.Response.Headers["Expires"] =
                         Configuration["StaticFiles:Headers:Expires"];
+                    }
                 }
             });
             if (!env.IsDevelopment())
             {
-                app.UseSpaStaticFiles();
+                app.UseSpaStaticFiles(new StaticFileOptions()
+                {
+                    ContentTypeProvider = provider
+                });
             }
 
             app.UseRouting();

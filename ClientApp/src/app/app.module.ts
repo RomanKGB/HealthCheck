@@ -21,6 +21,8 @@ import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { CityService } from './cities/city.service';
 import { CountryService } from './countries/country.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 
 @NgModule({
@@ -52,7 +54,8 @@ import { CountryService } from './countries/country.service';
         ]),
       BrowserAnimationsModule,
       AngularMaterialModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy: 'registerImmediately' })
   ],
   providers: [CityService, CountryService, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor,multi:true }],
     bootstrap: [AppComponent]
