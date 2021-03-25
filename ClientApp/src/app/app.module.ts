@@ -23,6 +23,9 @@ import { CityService } from './cities/city.service';
 import { CountryService } from './countries/country.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+//import { DiaryComponent } from './diary/diary.component';
 
 @NgModule({
     declarations: [
@@ -49,12 +52,17 @@ import { environment } from '../environments/environment';
           { path: 'city', component: CityEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'countries', component: CountriesComponent },
           { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
-          { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] }
+          { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] }//,
+          //{ path: 'diary', component: DiaryComponent },
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,
       AngularMaterialModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      CalendarModule.forRoot({
+        provide: DateAdapter,
+        useFactory: adapterFactory
+      })
   ],
   providers: [CityService, CountryService, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor,multi:true }],
     bootstrap: [AppComponent]

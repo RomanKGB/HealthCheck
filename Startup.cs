@@ -83,7 +83,26 @@ namespace HealthCheck
             provider.Mappings[".webmanifest"] = "application/manifest+json";
             app.UseStaticFiles(new StaticFileOptions()
             {
-                ContentTypeProvider = provider
+                ContentTypeProvider = provider,
+                OnPrepareResponse = (context) =>
+                {
+                    if (context.File.Name == "isOnline.txt")
+                    {
+                        // disable caching for these files
+                        context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                        context.Context.Response.Headers.Add("Expires", "-1");
+                    }
+                    else
+                    {
+                        // Retrieve cache configuration from appsettings.json
+                        context.Context.Response.Headers["Cache-Control"] =
+                            Configuration["StaticFiles:Headers:Cache-Control"];
+                        context.Context.Response.Headers["Pragma"] =
+                            Configuration["StaticFiles:Headers:Pragma"];
+                        context.Context.Response.Headers["Expires"] =
+                            Configuration["StaticFiles:Headers:Expires"];
+                    }
+                }
             });
             app.UseStaticFiles(new StaticFileOptions()
             {
