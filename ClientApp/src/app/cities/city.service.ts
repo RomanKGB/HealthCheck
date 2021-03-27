@@ -77,6 +77,29 @@ export class CityService extends BaseService {
     return this.http.get<ApiResult>(url, { params });
   }
 
+  getDiaryEntries<ApiResult>(
+    pageIndex: number,
+    pageSize: number,
+    sortColumn: string,
+    sortOrder: string,
+    filterColumn: string,
+    filterQuery: string): Observable<ApiResult> {
+    var url = this.baseUrl + 'api/Diary';
+    var params = new HttpParams()
+      .set("pageIndex", pageIndex.toString())
+      .set("pageSize", pageSize.toString())
+      .set("sortColumn", sortColumn)
+      .set("sortOrder", sortOrder);
+
+    if (filterQuery) {
+      params = params
+        .set("filterQuery", filterQuery)
+        .set("filterColumn", filterColumn);
+    }
+
+    return this.http.get<ApiResult>(url, { params });
+  }
+
   isDupeCity(item): Observable<boolean> {
     var url = this.baseUrl + "api/Cities/IsDupeCity";
     return this.http.post<boolean>(url, item);

@@ -25,7 +25,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-//import { DiaryComponent } from './diary/diary.component';
+import { DiaryComponent } from './diary/diary.component';
 
 @NgModule({
     declarations: [
@@ -52,8 +52,8 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
           { path: 'city', component: CityEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'countries', component: CountriesComponent },
           { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
-          { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] }//,
-          //{ path: 'diary', component: DiaryComponent },
+          { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
+          { path: 'diaries', component: DiaryComponent },
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,

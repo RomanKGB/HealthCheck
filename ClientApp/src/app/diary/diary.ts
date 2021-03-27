@@ -1,6 +1,6 @@
-export interface Diary {
+export interface DiaryEntry {
   id: number,
   entryDate: string,
-  entry: string,
+  entryText: string,
   color:string
 }

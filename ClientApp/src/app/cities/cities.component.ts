@@ -68,7 +68,7 @@ export class CitiesComponent {
     var filterColumn = (this.filterQuery) ? this.defaultFilterColumn : null;
     var filterQuery = (this.filterQuery) ? this.filterQuery : null;
 
-
+    
 
     this.cityService.getData<ApiResult<City>>(event.pageIndex, event.pageSize, sortColumn,sortOrder,filterColumn,filterQuery)
       .subscribe(result => {

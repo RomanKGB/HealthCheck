@@ -42,6 +42,10 @@ namespace HealthCheck
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DiaryDbContext>(options2 =>
+                options2.UseSqlServer(Configuration.GetConnectionString("DiaryConnection")));
+
+
 
             services.AddDefaultIdentity<ApplicationUser>(options =>
             {
