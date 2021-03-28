@@ -12,18 +12,19 @@ namespace HealthCheck.Data
         
         public DiaryDbContext(DbContextOptions<DiaryDbContext> options,IOptions<OperationalStoreOptions> operationalStorageOptions):base(options,operationalStorageOptions)
         {
-
+            //this.Database.
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<DiaryEntry>().ToTable("diary");
+            //modelBuilder.Entity<DiaryEntry>().ToTable("diary");
+            modelBuilder.Entity<DiaryEntry>().ToView("vDiary"); 
         }
 
         public DbSet<DiaryEntry> DiaryEntries { get; set; }
-        
+        //public DbSet<DiaryEntry> DiaryEntriesFormatted { get; set; }
 
     }
 }

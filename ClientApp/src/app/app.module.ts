@@ -26,6 +26,9 @@ import { environment } from '../environments/environment';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DiaryComponent } from './diary/diary.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatNativeDateModule} from '@angular/material/core';
 
 @NgModule({
     declarations: [
@@ -37,7 +40,8 @@ import { DiaryComponent } from './diary/diary.component';
         CitiesComponent,
         CityEditComponent,
     CountriesComponent,
-    CountryEditComponent
+    CountryEditComponent,
+    DiaryComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -53,18 +57,21 @@ import { DiaryComponent } from './diary/diary.component';
           { path: 'countries', component: CountriesComponent },
           { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
-          { path: 'diaries', component: DiaryComponent },
+          { path: 'diary', component: DiaryComponent },
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,
       AngularMaterialModule,
+      MatDatepickerModule,
+      MatGridListModule,
+      MatNativeDateModule,
       ReactiveFormsModule,
       CalendarModule.forRoot({
         provide: DateAdapter,
         useFactory: adapterFactory
       })
   ],
-  providers: [CityService, CountryService, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor,multi:true }],
+  providers: [CityService, CountryService, DiaryComponent, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

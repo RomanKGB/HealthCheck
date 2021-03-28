@@ -4,11 +4,11 @@
     {
         public DiaryEntryDTO() { }
 
-        public int EntryId { get; set; }
-        public string EntryText { get; set; }
-        public string EntryColor { get; set; }
-        public string EntryDate { get; set; }
-        public int EntryDateInt { get; set; }
+        public int entry_id { get; set; }
+        public string entry_text { get; set; }
+        public string entry_color { get; set; }
+        public string entry_date { get; set; }
+        public int entry_date_int { get; set; }
         
     }
 }

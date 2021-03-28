@@ -1,0 +1,65 @@
+<h1>Diary</h1>
+<p>Diary Entries</p>
+<p *ngIf="!entries"><em>Loading diary entries...</em></p>
+
+<div class="commands text-right" *ngIf="entries">
+  <button type="submit" [routerLink]="['/country']" class="btn-primary btn-success">Add a New Entry</button>
+</div>
+
+<mat-form-field [hidden]="!entries">
+  <input matInput (keyup)="loadData($event.target.value)" placeholder="Filter by country name, or part of it" />
+</mat-form-field>
+<mat-grid-list cols="4" align="left">
+  <mat-grid-tile></mat-grid-tile>
+  <mat-grid-tile>
+
+    <mat-calendar [selected]="selectedDate"
+                  [startAt]="startAt"
+                  [minDate]="minDate"
+                  [maxDate]="maxDate"
+                  [dateFilter]="myDateFilter"
+                  (selectedChange)="onSelect($event)">
+    </mat-calendar>
+
+  </mat-grid-tile>
+  <mat-grid-tile>
+
+    <p class="cal_date">{{DayAndDate}}, {{year}}</p>
+
+  </mat-grid-tile>
+  <mat-grid-tile></mat-grid-tile>
+</mat-grid-list>
+
+
+<table mat-table [dataSource]="entries" class="mat-elevation-z8" [hidden]="!entries"
+       matSort (matSortChange)="loadData()"
+       matSortActive="{{defaultSortColumn}}"
+       matSortDirection="{{defaultSortOrder}}">
+  <ng-container matColumnDef="entry_id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_id</th>
+    <td mat-cell *matCellDef="let diaryentry">{{diaryentry.entry_id}}</td>
+  </ng-container>
+  <ng-container matColumnDef="entry_date">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_date</th>
+    <td mat-cell *matCellDef="let diaryentry">
+      {{diaryentry.entry_date}}
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="entry_text">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_text</th>
+    <td mat-cell *matCellDef="let diaryentry">{{diaryentry.entry_text}}</td>
+  </ng-container>
+  <ng-container matColumnDef="entry_color">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_color</th>
+    <td mat-cell *matCellDef="let diaryentry">{{diaryentry.entry_color}}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns:displayedColumns;"></tr>
+</table>
+
+<mat-paginator [hidden]="!entries"
+               (page)="pageEvent=getData($event)"
+               [pageSize]="10"
+               [pageSizeOptions]="[10,20,50]"
+               showFirstLastButtons></mat-paginator>

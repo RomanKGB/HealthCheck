@@ -4,29 +4,43 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DiaryEntry } from './diary';
+import { Observable } from 'rxjs';
 import { ApiResult } from '../base.service';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
 })
 
 @Component({
-  selector: 'app-diary',
+  selector: 'app-diaries',
   templateUrl: './diary.component.html',
   styleUrls: ['./diary.component.css']
 })
 
 export class DiaryComponent {
-  public displayedColumns: string[] = ['id', 'name', 'iso2', 'iso3', 'totalCities'];
-  public countries: MatTableDataSource<DiaryEntry>;
+  public displayedColumns: string[] = ['entry_id', 'entry_date', 'entry_text', 'entry_color'];
+  public entries: MatTableDataSource<DiaryEntry>;
   defaultPageIndex: number = 0;
   defaultPageSize: number = 10;
-  public defaultSortColumn: string = "name";
+  public defaultSortColumn: string = "entry_id";
   public defaultSortOrder: string = "asc";
-  defaultFilterColumn: string = "name";
+  defaultFilterColumn: string = "entry_date";
   filterQuery: string = null;
   protected http: HttpClient;
   protected baseUrl: string;
+  title = 'ng-calendar-demo';
+  selectedDate = new Date("2021/01/01");
+  startAt = new Date("2021/01/01");
+  minDate = new Date('2012/01/01');
+  maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
+  year: any;
+  DayAndDate: string;
+
+  range = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -34,11 +48,34 @@ export class DiaryComponent {
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.http = http;
+    this.onSelect(this.selectedDate);
   }
 
   ngOnInit() {
-    console.info("Privet");
+    this.loadData(null);
   }
+
+  
+
+  onSelect(event) {
+    console.log(event);
+    this.selectedDate = event;
+    const dateString = event.toDateString();
+    console.log(new Date().toLocaleDateString("en-US").toString());
+    console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    const dateValue = dateString.split(' ');
+    this.year = dateValue[3];
+    this.DayAndDate = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+    
+    this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+  }
+
+  myDateFilter = (d: Date): boolean => {
+    const day = d.getDay();
+    // Prevent Saturday and Sunday from being selected.
+    return day !== 0 && day !== 6;
+  }
+
 
   loadData(query: string = null) {
     var pageEvent = new PageEvent();
@@ -51,7 +88,7 @@ export class DiaryComponent {
   }
 
   getData(event: PageEvent) {
-    var url = this.baseUrl + 'api/Diaries';
+    var url = this.baseUrl + 'api/diary';
     var params = new HttpParams()
       .set("pageIndex", event.pageIndex.toString())
       .set("pageSize", event.pageSize.toString())
@@ -66,6 +103,8 @@ export class DiaryComponent {
         .set("filterQuery", this.filterQuery);
     }
 
+
+
     var sortColumn = (this.sort) ? this.sort.active : this.defaultSortColumn;
     var sortOrder = (this.sort) ? this.sort.direction : this.defaultSortOrder;
     var filterColumn = (this.filterQuery) ? this.defaultFilterColumn : null;
@@ -77,7 +116,42 @@ export class DiaryComponent {
         this.paginator.length = result.totalCount;
         this.paginator.pageIndex = result.pageIndex;
         this.paginator.pageSize = result.pageSize;
-        this.countries = new MatTableDataSource<DiaryEntry>(result.data);
+        this.entries = new MatTableDataSource<DiaryEntry>(result.data);
+      }, error => console.error(error));
+  }
+
+  getEntries(selected_date: string = new Date().toString()) {
+    var url = this.baseUrl + 'api/diary';
+    var params = new HttpParams()
+      .set("pageIndex", this.defaultPageIndex.toString())
+      .set("pageSize", this.defaultPageSize.toString())
+      .set("sortColumn", (this.sort)
+        ? this.sort.active
+        : this.defaultSortColumn)
+      .set("sortOrder", (this.sort)
+        ? this.sort.direction
+        : this.defaultSortOrder);
+    //if (this.filterQuery) {
+      params = params.set("filterColumn", this.defaultFilterColumn)
+        .set("filterQuery", selected_date);
+        //.set("filterQuery", "01/01/2018");
+    //}
+
+    //params = params.set("selected_date", selected_date);
+
+
+    var sortColumn = (this.sort) ? this.sort.active : this.defaultSortColumn;
+    var sortOrder = (this.sort) ? this.sort.direction : this.defaultSortOrder;
+    var filterColumn = (this.filterQuery) ? this.defaultFilterColumn : null;
+    var filterQuery = (this.filterQuery) ? this.filterQuery : null;
+
+
+    this.http.get<ApiResult<DiaryEntry>>(url, { params })
+      .subscribe(result => {
+        this.paginator.length = result.totalCount;
+        this.paginator.pageIndex = result.pageIndex;
+        this.paginator.pageSize = result.pageSize;
+        this.entries = new MatTableDataSource<DiaryEntry>(result.data);
       }, error => console.error(error));
   }
 }

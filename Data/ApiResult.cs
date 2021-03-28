@@ -53,7 +53,13 @@ namespace HealthCheck.Data
             if (!String.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
             {
                 sortOrder = !String.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC" ? "ASC" : "DESC";
-                source = source.OrderBy(String.Format("{0} {1}", sortColumn, sortOrder)); 
+                if (sortColumn == "entry_date")
+                {
+                    source = source.OrderBy(String.Format("{0} {1}", sortColumn, sortOrder));
+                }
+                else
+                    source = source.OrderBy(String.Format("{0} {1}", sortColumn, sortOrder)); 
+                
             }
             
             source = source
@@ -62,7 +68,7 @@ namespace HealthCheck.Data
 
 #if DEBUG
             {
-                var sql = source.ToSql();
+                //var sql = source.ToSql();
             }
 #endif
             var data = await source.ToListAsync();

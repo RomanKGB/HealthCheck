@@ -24,6 +24,7 @@ namespace HealthCheck.Controllers
         }
 
         [HttpGet]
+        
         public async Task<ActionResult<ApiResult<DiaryEntryDTO>>> GetDiaries(
             int pageIndex = 0,
             int pageSize = 10,
@@ -37,10 +38,10 @@ namespace HealthCheck.Controllers
                 _context.DiaryEntries
                 .Select(c => new DiaryEntryDTO()
                 {
-                    EntryId = c.EntryId,
-                    EntryText = c.EntryText,
-                    EntryDate = c.EntryDate,
-                    EntryColor = c.EntryColor
+                    entry_id = c.entry_id,
+                    entry_text = c.entry_text,
+                    entry_date = c.entry_date,
+                    entry_color = c.entry_color.ToString()
                     //TotalEntries = _context.DiaryEntries.Count<DiaryEntry>
                 }),
                 pageIndex,
