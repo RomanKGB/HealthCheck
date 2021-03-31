@@ -30,12 +30,15 @@ export class DiaryComponent {
   protected http: HttpClient;
   protected baseUrl: string;
   title = 'ng-calendar-demo';
-  selectedDate = new Date("2021/01/01");
+  selectedDateFrom = new Date("2021/01/01");
+  selectedDateTo = new Date();
   startAt = new Date("2021/01/01");
   minDate = new Date('2012/01/01');
   maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
-  year: any;
-  DayAndDate: string;
+  yearFrom: any;
+  yearTo: any;
+  DayAndDateFrom: string;
+  DayAndDateTo: string;
 
   range = new FormGroup({
     start: new FormControl(),
@@ -48,26 +51,51 @@ export class DiaryComponent {
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.http = http;
-    this.onSelect(this.selectedDate);
+    //this.onSelectTo(this.selectedDate);
   }
 
   ngOnInit() {
+    //set start date
+    var dateString = this.selectedDateFrom.toDateString();
+    var dateValue = dateString.split(' ');
+    this.yearFrom = dateValue[3];
+    this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+    //set end date
+    dateString = this.selectedDateTo.toDateString();
+    dateValue = dateString.split(' ');
+    this.yearTo = dateValue[3];
+    this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
     this.loadData(null);
   }
 
   
 
-  onSelect(event) {
-    console.log(event);
-    this.selectedDate = event;
+  onSelectFrom(event) {
+    //console.log(event);
+    this.selectedDateFrom = event;
     const dateString = event.toDateString();
-    console.log(new Date().toLocaleDateString("en-US").toString());
-    console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    //console.log(new Date().toLocaleDateString("en-US").toString());
+    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
     const dateValue = dateString.split(' ');
-    this.year = dateValue[3];
-    this.DayAndDate = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+    this.yearFrom = dateValue[3];
+    this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
     
-    this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
+  }
+
+  onSelectTo(event) {
+    //console.log(event);
+    this.selectedDateTo = event;
+    const dateString = event.toDateString();
+    //console.log(new Date().toLocaleDateString("en-US").toString());
+    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    const dateValue = dateString.split(' ');
+    this.yearTo = dateValue[3];
+    this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+
+    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }
 
   myDateFilter = (d: Date): boolean => {
@@ -118,6 +146,42 @@ export class DiaryComponent {
         this.paginator.pageSize = result.pageSize;
         this.entries = new MatTableDataSource<DiaryEntry>(result.data);
       }, error => console.error(error));
+  }
+
+  getEntries2(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
+    console.log("From:" + new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString() + ", To:" + new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
+    var url = this.baseUrl + 'api/diary/GetRange';
+    var params = new HttpParams()
+      .set("pageIndex", "0")
+      .set("pageSize", "50")
+      .set("sortColumn", (this.sort)
+        ? this.sort.active
+        : this.defaultSortColumn)
+      .set("sortOrder", (this.sort)
+        ? this.sort.direction
+        : this.defaultSortOrder);
+    
+    params = params.set("dateFrom", selected_date_from)
+      .set("dateTo", selected_date_to);
+    
+
+
+
+    var sortColumn = (this.sort) ? this.sort.active : this.defaultSortColumn;
+    var sortOrder = (this.sort) ? this.sort.direction : this.defaultSortOrder;
+    var filterColumn = (this.filterQuery) ? this.defaultFilterColumn : null;
+    var filterQuery = (this.filterQuery) ? this.filterQuery : null;
+
+
+    this.http.get<ApiResult<DiaryEntry>>(url, { params })
+      .subscribe(result => {
+        this.paginator.length = result.totalCount;
+        this.paginator.pageIndex = result.pageIndex;
+        this.paginator.pageSize = result.pageSize;
+        this.entries = new MatTableDataSource<DiaryEntry>(result.data);
+      }, error => console.error(error));
+
+    
   }
 
   getEntries(selected_date: string = new Date().toString()) {

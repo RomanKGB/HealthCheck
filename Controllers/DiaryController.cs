@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthCheck.Data;
 using HealthCheck.Data.Models;
+using Microsoft.Data.SqlClient;
+using System.Data;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HealthCheck.Controllers
@@ -54,6 +56,52 @@ namespace HealthCheck.Controllers
             
         }
 
+        
+        [HttpGet]
+        [Route("GetRange")]
+        public async Task<ActionResult<ApiResult<DiaryEntryDTO>>> GetDiariesRange(
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null,
+            string dateFrom=null,
+            string dateTo=null
+            )
+        {
+            string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where " 
+                + "convert(date, entry_date) between convert(date, '"+ dateFrom+"') and convert(date, '"+dateTo+"')";
+            IQueryable<DiaryEntry> dbSetLocal = _context.DiaryEntries.FromSqlRaw<DiaryEntry>(strSQL);
+            try
+            {
+                return await ApiResult<DiaryEntryDTO>.CreateAsync(
+                    dbSetLocal
+                    .Select(c => new DiaryEntryDTO()
+                    {
+                        entry_id = c.entry_id,
+                        entry_text = c.entry_text,
+                        entry_date = c.entry_date,
+                        entry_color = c.entry_color.ToString()
+                    //TotalEntries = _context.DiaryEntries.Count<DiaryEntry>
+                    }),
+                    pageIndex,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    filterColumn,
+                    filterQuery
+                    );
+            }
+            catch(System.InvalidCastException e)
+            {
+
+                Console.WriteLine(e.Message);
+                return null;
+                
+            }
+
+        }
         /*[HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(int id)
         {

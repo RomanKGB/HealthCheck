@@ -21,6 +21,7 @@ namespace HealthCheck.Data
 
             //modelBuilder.Entity<DiaryEntry>().ToTable("diary");
             modelBuilder.Entity<DiaryEntry>().ToView("vDiary"); 
+            
         }
 
         public DbSet<DiaryEntry> DiaryEntries { get; set; }
