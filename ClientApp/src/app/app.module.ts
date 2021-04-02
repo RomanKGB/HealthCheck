@@ -26,6 +26,7 @@ import { environment } from '../environments/environment';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DiaryComponent } from './diary/diary.component';
+import { DiaryCalendar } from './diary/diarycalendar.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatNativeDateModule} from '@angular/material/core';
@@ -41,7 +42,8 @@ import { MatNativeDateModule} from '@angular/material/core';
         CityEditComponent,
     CountriesComponent,
     CountryEditComponent,
-    DiaryComponent
+    DiaryComponent,
+    DiaryCalendar
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -58,6 +60,7 @@ import { MatNativeDateModule} from '@angular/material/core';
           { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'diary', component: DiaryComponent },
+          { path: 'calendar', component:DiaryCalendar }
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,

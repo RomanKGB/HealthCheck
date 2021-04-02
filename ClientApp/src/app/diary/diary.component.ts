@@ -19,11 +19,11 @@ import { FormGroup, FormControl } from '@angular/forms';
 })
 
 export class DiaryComponent {
-  public displayedColumns: string[] = ['entry_id', 'entry_date', 'entry_text', 'entry_color'];
+  public displayedColumns: string[] = ['entry_date', 'entry_text', 'entry_color'];
   public entries: MatTableDataSource<DiaryEntry>;
   defaultPageIndex: number = 0;
   defaultPageSize: number = 10;
-  public defaultSortColumn: string = "entry_id";
+  public defaultSortColumn: string = "entry_date";
   public defaultSortOrder: string = "asc";
   defaultFilterColumn: string = "entry_date";
   filterQuery: string = null;
@@ -33,6 +33,7 @@ export class DiaryComponent {
   selectedDateFrom = new Date("2021/01/01");
   selectedDateTo = new Date();
   startAt = new Date("2021/01/01");
+  startAtTo = new Date();
   minDate = new Date('2012/01/01');
   maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
   yearFrom: any;
@@ -65,10 +66,34 @@ export class DiaryComponent {
     dateValue = dateString.split(' ');
     this.yearTo = dateValue[3];
     this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
-    this.loadData(null);
+    //this.loadData(null);
+    this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }
 
-  
+  colorCell(entry_color: string) {
+    var cellColor : string = "";
+    switch (entry_color) {
+      case "1":
+        cellColor = "red"
+        break;
+      case "2":
+        cellColor = "orange"
+        break;
+      case "3":
+        cellColor = "yellow"
+        break;
+      case "4":
+        cellColor = "green"
+        break;
+      case "5":
+        cellColor = "blue"
+        break;
+      default:
+        cellColor="red"
+    }
+    
+    return cellColor;
+  }
 
   onSelectFrom(event) {
     //console.log(event);
@@ -101,9 +126,36 @@ export class DiaryComponent {
   myDateFilter = (d: Date): boolean => {
     const day = d.getDay();
     // Prevent Saturday and Sunday from being selected.
-    return day !== 0 && day !== 6;
+    return true;//day !== 0 && day !== 6;
   }
 
+
+  getDayOfWeek(paramD: Date) {
+    var gsDayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    var d = new Date(paramD);
+    return gsDayNames[d.getDay()];
+  }
+
+  formatText=(stringToFormat:string): string=>{
+    var arrItems = stringToFormat.split("<li>");
+    var retString = "";
+
+    for (var i = 0; i < arrItems.length; i++) {
+      console.log(arrItems[i].toString());
+      retString = retString + "<p>" +  arrItems[i].toString() +"</p>";
+    }
+    console.log(retString);
+    return stringToFormat;
+}
 
   loadData(query: string = null) {
     var pageEvent = new PageEvent();
@@ -139,21 +191,24 @@ export class DiaryComponent {
     var filterQuery = (this.filterQuery) ? this.filterQuery : null;
 
 
-    this.http.get < ApiResult<DiaryEntry>>(url, { params })
+    /*this.http.get < ApiResult<DiaryEntry>>(url, { params })
       .subscribe(result => {
         this.paginator.length = result.totalCount;
         this.paginator.pageIndex = result.pageIndex;
         this.paginator.pageSize = result.pageSize;
         this.entries = new MatTableDataSource<DiaryEntry>(result.data);
       }, error => console.error(error));
+    */
+    this.getEntries2(this.selectedDateFrom.toString(), this.selectedDateTo.toString(), event.pageIndex.toString(), event.pageSize.toString())
   }
 
-  getEntries2(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
+  getEntries2(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString(),
+            paramPageIndex:string="0", paramPageSize:string="50") {
     console.log("From:" + new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString() + ", To:" + new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
     var url = this.baseUrl + 'api/diary/GetRange';
     var params = new HttpParams()
-      .set("pageIndex", "0")
-      .set("pageSize", "50")
+      .set("pageIndex", paramPageIndex)
+      .set("pageSize", paramPageSize)
       .set("sortColumn", (this.sort)
         ? this.sort.active
         : this.defaultSortColumn)
@@ -161,8 +216,8 @@ export class DiaryComponent {
         ? this.sort.direction
         : this.defaultSortOrder);
     
-    params = params.set("dateFrom", selected_date_from)
-      .set("dateTo", selected_date_to);
+    params = params.set("dateFrom", new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString() )
+      .set("dateTo", new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
     
 
 

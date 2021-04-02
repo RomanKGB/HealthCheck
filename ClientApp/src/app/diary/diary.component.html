@@ -8,56 +8,52 @@
 
 
 <mat-grid-list cols="4" align="left">
-  <mat-grid-tile></mat-grid-tile>
   <mat-grid-tile>
-
-    <mat-calendar [selected]="selectedDateFrom"
-                  [startAt]="startAt"
-                  [minDate]="minDate"
-                  [maxDate]="maxDate"
-                  [dateFilter]="myDateFilter"
-                  (selectedChange)="onSelectFrom($event)">
-    </mat-calendar>
-    <br /><br />
+      <mat-calendar [selected]="selectedDateFrom"
+              [startAt]="startAt"
+              [minDate]="minDate"
+              [maxDate]="maxDate"
+              [dateFilter]="myDateFilter"
+              (selectedChange)="onSelectFrom($event)">
+      </mat-calendar>
+  </mat-grid-tile>
+  <mat-grid-tile>
     <p class="cal_date">From: {{DayAndDateFrom}}, {{yearFrom}}</p>
   </mat-grid-tile>
   <mat-grid-tile>
     <mat-calendar [selected]="selectedDateTo"
-                  [startAt]="startAt"
+                  [startAt]="startAtTo"
                   [minDate]="minDate"
                   [maxDate]="maxDate"
                   [dateFilter]="myDateFilter"
                   (selectedChange)="onSelectTo($event)">
     </mat-calendar>
-    <p class="cal_date">To: {{DayAndDateTo}}, {{yearTo}}</p>
+    
 
   </mat-grid-tile>
-  <mat-grid-tile></mat-grid-tile>
+  <mat-grid-tile><p class="cal_date">To: {{DayAndDateTo}}, {{yearTo}}</p></mat-grid-tile>
 </mat-grid-list>
 
 
-<table mat-table [dataSource]="entries" class="mat-elevation-z8" [hidden]="!entries"
+<table mat-table [dataSource]="entries" class="mat-elevation-z8" cellspacing="5" cellpadding="3" [hidden]="!entries"
        matSort (matSortChange)="loadData()"
        matSortActive="{{defaultSortColumn}}"
        matSortDirection="{{defaultSortOrder}}">
-  <ng-container matColumnDef="entry_id">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_id</th>
-    <td mat-cell *matCellDef="let diaryentry">{{diaryentry.entry_id}}</td>
-  </ng-container>
+
   <ng-container matColumnDef="entry_date">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_date</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
     <td mat-cell *matCellDef="let diaryentry">
-      {{diaryentry.entry_date}}
+      {{diaryentry.entry_date}}&nbsp;&nbsp;&nbsp;({{getDayOfWeek(diaryentry.entry_date)}})
     </td>
   </ng-container>
   <ng-container matColumnDef="entry_text">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_text</th>
-    <td mat-cell *matCellDef="let diaryentry">{{diaryentry.entry_text}}</td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Text</th>
+    <td mat-cell *matCellDef="let diaryentry"><div>{{formatText(diaryentry.entry_text)}}</div></td>
   </ng-container>
   <ng-container matColumnDef="entry_color">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>entry_color</th>
-    <td mat-cell *matCellDef="let diaryentry">
-      <span [hidden]="!diaryentry.entry_color==5" style="background-color:red">{{diaryentry.entry_color}}</span>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Color</th>
+    <td mat-cell *matCellDef="let diaryentry" [ngStyle]="{'background-color': colorCell(diaryentry.entry_color)}">
+     &nbsp;
     </td>
   </ng-container>
 
