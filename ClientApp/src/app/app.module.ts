@@ -29,7 +29,15 @@ import { DiaryComponent } from './diary/diary.component';
 import { DiaryCalendar } from './diary/diarycalendar.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatNativeDateModule} from '@angular/material/core';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
+FullCalendarModule.registerPlugins([
+  dayGridPlugin,
+  interactionPlugin
+]);
 
 @NgModule({
     declarations: [
@@ -68,6 +76,7 @@ import { MatNativeDateModule} from '@angular/material/core';
       MatDatepickerModule,
       MatGridListModule,
       MatNativeDateModule,
+      FullCalendarModule,
       ReactiveFormsModule,
       CalendarModule.forRoot({
         provide: DateAdapter,

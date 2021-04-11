@@ -102,83 +102,44 @@ namespace HealthCheck.Controllers
             }
 
         }
-        /*[HttpGet("{id}")]
-        public async Task<ActionResult<Country>> GetCountry(int id)
+
+        [HttpGet]
+        [Route("GetCalendarEvents")]
+        public async Task<ActionResult<ApiResult<DiaryEntryDTO>>> GetCalendarEvents(
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null,
+            string dateFrom = null,
+            string dateTo = null
+            )
         {
-            var country = await _context.DiaryEntries.FindAsync(id);
 
-            if (country == null) return NotFound();
-
-            return country;
-        }
-
-        [Authorize]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountry(int id, Country country)
-        {
-            if (id != country.Id) return BadRequest();
-
-            _context.Entry(country).State = EntityState.Modified;
-
-            try
+            return await Task.Run(() =>
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CountryExists(id)) return NotFound();
-                else throw;
-            }
+                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
+                    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
 
-            return NoContent();
-        }
-        [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(Country country)
-        {
-            _context.DiaryEntries.Add(country);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCountry", new { id = country.Id }, country);
-        }
+                DataLayer dbLayer = new DataLayer();
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<DiaryEntryDTO> diaryList = new List<DiaryEntryDTO>();
+                diaryList = (from DataRow dr in dbTable.Rows
+                             select new DiaryEntryDTO()
+                             {
+                                 entry_id = Convert.ToInt32(dr["entry_id"]),
+                                 entry_text = dr["entry_text"].ToString(),
+                                 entry_color = dr["entry_color"].ToString(),
+                                 entry_date = dr["entry_date"].ToString(),
+                                 entry_date_int = 0
+                             }).ToList();
 
-        // DELETE: api/Countries/5
-        [Authorize]
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Country>> DeleteCountry(int id)
-        {
-            var country = await _context.Countries.FindAsync(id);
-            if (country == null)
-            {
-                return NotFound();
-            }
-
-            _context.Countries.Remove(country);
-            await _context.SaveChangesAsync();
-
-            return country;
-        }
-        private bool CountryExists(int id)
-        {
-            return _context.Countries.Any(e => e.Id == id);
+                 return new ApiResult<DiaryEntryDTO>(diaryList, 1, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
+            });
         }
 
-        [HttpPost]
-        [Route("IsDupeField")]
-        public bool IsDupeField(int countryId, string fieldName, string fieldValue)
-        {
-            switch (fieldName)
-            {
-                case "name":
-                    return _context.Countries.Any(c => c.Name == fieldValue && c.Id != countryId);
-                case "iso2":
-                    return _context.Countries.Any(c => c.ISO2 == fieldValue && c.Id != countryId);
-                case "iso3":
-                    return _context.Countries.Any(c => c.ISO3 == fieldValue && c.Id != countryId);
-                default: return false;
-            }
-        }
-        */
     }
 }
 

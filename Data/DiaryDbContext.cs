@@ -20,8 +20,8 @@ namespace HealthCheck.Data
             base.OnModelCreating(modelBuilder);
 
             //modelBuilder.Entity<DiaryEntry>().ToTable("diary");
-            modelBuilder.Entity<DiaryEntry>().ToView("vDiary"); 
-            
+            modelBuilder.Entity<DiaryEntry>().ToView("vDiary");
+                      
         }
 
         public DbSet<DiaryEntry> DiaryEntries { get; set; }

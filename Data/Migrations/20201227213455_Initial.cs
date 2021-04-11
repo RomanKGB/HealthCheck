@@ -48,6 +48,8 @@ namespace HealthCheck.Data.Migrations
                 name: "IX_Cities_CountryID",
                 table: "Cities",
                 column: "CountryID");
+
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

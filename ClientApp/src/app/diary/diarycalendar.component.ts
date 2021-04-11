@@ -1,7 +1,10 @@
 import { Component, Inject, ViewChild, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
-//import { INITIAL_EVENTS, createEventId } from './event-utils';
+import { INITIAL_EVENTS, createEventId } from './event-utils';
+import { DiaryEntry } from './diary';
+import { ApiResult } from '../base.service';
+
 
 @Injectable({
   providedIn: 'root',
@@ -32,34 +35,32 @@ export class DiaryCalendar {
       right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
     initialView: 'dayGridMonth',
-    //initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
+    //initialEvents: INITIAL_EVENTS,
+    // alternatively, use the `events` setting to fetch from a feed
+    events: [
+      { title: 'event 1', date: '2021-04-01' },
+      { title: 'event 2', date: '2021-04-02' }
+    ],
     weekends: true,
     editable: true,
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,
     select: this.handleDateSelect.bind(this),
+    //dateClick: this.handleDateClick.bind(this),
     eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this)
   };
 
 
-  currentEvents: EventApi[] = [];
+  //currentEvents: EventApi[] = [];//{ title: 'event 1', date: '2019-04-01' },{ title: 'event 2', date: '2019-04-02' };
 
   //currentEvents.
 
-  handleCalendarToggle() {
-    this.calendarVisible = !this.calendarVisible;
-  }
+  
 
-  handleWeekendsToggle() {
-    const { calendarOptions } = this;
-    calendarOptions.weekends = !calendarOptions.weekends;
-  }
+  
 
-  createEventId(){
-  return 1;
-}
 
   handleDateSelect(selectInfo: DateSelectArg) {
     const title = prompt('Please enter a new title for your event');
@@ -69,7 +70,7 @@ export class DiaryCalendar {
 
     if (title) {
       calendarApi.addEvent({
-        id: this.createEventId().toString(),
+        id: createEventId().toString(),
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
@@ -85,9 +86,25 @@ export class DiaryCalendar {
   }
 
   handleEvents(events: EventApi[]) {
-    this.currentEvents = events;
+    //this.currentEvents = events;
   }
 
   ngOnInit() {
+    this.loadEvents("1/1/2021","4/1/2021")
+  }
+
+  loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
+    var url = this.baseUrl + 'api/diary/GetCalendarEvents';
+    var params = new HttpParams()
+      .set("dateFrom", selected_date_from)
+      .set("dateTo", selected_date_to);
+
+    
+
+    this.http.get<ApiResult<DiaryEntry>>(url, { params })
+      .subscribe(result => {
+        //this.calendarOptions.events = result.data;
+        console.log(result.data);
+      }, error => console.error(error));
   }
 }

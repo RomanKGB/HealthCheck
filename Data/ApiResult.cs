@@ -11,7 +11,7 @@ namespace HealthCheck.Data
 {
     public class ApiResult<T>
     {
-        private ApiResult(
+        public ApiResult(
             List<T> data,
             int count,
             int pageIndex,
@@ -75,6 +75,8 @@ namespace HealthCheck.Data
 
             return new ApiResult<T>(data, count, pageIndex, pageSize,sortColumn,sortOrder,filterColumn,filterQuery);
         }
+
+
 
         public static bool IsValidProperty(string propertyName,bool throwExceptionIfNotFound=true)
         {

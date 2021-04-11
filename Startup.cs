@@ -19,6 +19,7 @@ namespace HealthCheck
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            AppData.configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -61,7 +62,7 @@ namespace HealthCheck
             services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
             services.AddAuthentication().AddIdentityServerJwt();
-
+            services.AddSingleton<IConfiguration>(Configuration);
             services.AddHealthChecks()
                 .AddCheck("ICMP_01", new ICMPHealthCheck("www.nb.com", 100))
                 .AddCheck("ICMP_02", new ICMPHealthCheck("www.google.com", 100))
@@ -81,6 +82,8 @@ namespace HealthCheck
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            
 
             app.UseHttpsRedirection();
             FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
