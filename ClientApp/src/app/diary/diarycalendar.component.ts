@@ -1,6 +1,6 @@
 import { Component, Inject, ViewChild, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { CalendarOptions, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/angular';
+import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, Calendar } from '@fullcalendar/angular';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
 import { DiaryEntry } from './diary';
 import { ApiResult } from '../base.service';
@@ -83,6 +83,7 @@ export class DiaryCalendar {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
       clickInfo.event.remove();
     }
+    //{ title: 'event 1', date: '2019-04-01' }, { title: 'event 2', date: '2019-04-02' };
   }
 
   handleEvents(events: EventApi[]) {
@@ -106,5 +107,7 @@ export class DiaryCalendar {
         //this.calendarOptions.events = result.data;
         console.log(result.data);
       }, error => console.error(error));
+
+
   }
 }

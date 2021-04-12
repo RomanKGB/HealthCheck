@@ -136,7 +136,7 @@ namespace HealthCheck.Controllers
                                  entry_date_int = 0
                              }).ToList();
 
-                 return new ApiResult<DiaryEntryDTO>(diaryList, 1, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
+                 return new ApiResult<DiaryEntryDTO>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
             });
         }
 
