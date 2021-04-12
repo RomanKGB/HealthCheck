@@ -4,6 +4,7 @@ import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, Calendar } fro
 import { INITIAL_EVENTS, createEventId } from './event-utils';
 import { DiaryEntry } from './diary';
 import { ApiResult } from '../base.service';
+import { DiaryEntryCalendar } from './diarycalendar';
 
 
 @Injectable({
@@ -19,6 +20,7 @@ import { ApiResult } from '../base.service';
 export class DiaryCalendar {
   protected http: HttpClient;
   protected baseUrl: string;
+  protected posts = [];
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -28,7 +30,8 @@ export class DiaryCalendar {
 
 
   calendarVisible = true;
-  calendarOptions: CalendarOptions = {
+  calendarOptions: CalendarOptions;
+  /*= {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
@@ -57,7 +60,7 @@ export class DiaryCalendar {
 
   //currentEvents.
 
-  
+  */
 
   
 
@@ -102,12 +105,15 @@ export class DiaryCalendar {
 
     
 
-    this.http.get<ApiResult<DiaryEntry>>(url, { params })
+    this.http.get<ApiResult<DiaryEntryCalendar>>(url, { params })
       .subscribe(result => {
-        //this.calendarOptions.events = result.data;
+        this.calendarOptions = {
+          initialView: 'dayGridMonth',
+          events: result.data
+        };
         console.log(result.data);
       }, error => console.error(error));
 
-
+    
   }
 }

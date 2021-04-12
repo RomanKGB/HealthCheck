@@ -105,7 +105,7 @@ namespace HealthCheck.Controllers
 
         [HttpGet]
         [Route("GetCalendarEvents")]
-        public async Task<ActionResult<ApiResult<DiaryEntryDTO>>> GetCalendarEvents(
+        public async Task<ActionResult<ApiResult<DiaryEntryCalendar>>> GetCalendarEvents(
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -125,18 +125,15 @@ namespace HealthCheck.Controllers
 
                 DataLayer dbLayer = new DataLayer();
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
-                List<DiaryEntryDTO> diaryList = new List<DiaryEntryDTO>();
+                List<DiaryEntryCalendar> diaryList = new List<DiaryEntryCalendar>();
                 diaryList = (from DataRow dr in dbTable.Rows
-                             select new DiaryEntryDTO()
+                             select new DiaryEntryCalendar()
                              {
-                                 entry_id = Convert.ToInt32(dr["entry_id"]),
-                                 entry_text = dr["entry_text"].ToString(),
-                                 entry_color = dr["entry_color"].ToString(),
-                                 entry_date = dr["entry_date"].ToString(),
-                                 entry_date_int = 0
+                                 title = dr["entry_text"].ToString(),
+                                 date = dr["entry_date"].ToString()
                              }).ToList();
 
-                 return new ApiResult<DiaryEntryDTO>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
+                 return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
             });
         }
 

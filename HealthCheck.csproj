@@ -50,6 +50,7 @@
     <None Remove="ClientApp\src\app\diary\diary.component.ts" />
     <None Remove="ClientApp\src\app\diary\diary.ts" />
     <None Remove="ClientApp\src\app\diary\diarycalendar.component.ts" />
+    <None Remove="ClientApp\src\app\diary\diarycalendar.ts" />
     <None Remove="ClientApp\src\app\diary\event-utils.ts" />
   </ItemGroup>
 
@@ -77,6 +78,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\diary\diary.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diarycalendar.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\event-utils.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\diary\diarycalendar.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
