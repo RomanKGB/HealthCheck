@@ -1,4 +1,6 @@
 export interface DiaryEntryCalendar {
+  id:string,
   title: string,
-  date: string
+  date: string,
+  backgroundColor:string
 }

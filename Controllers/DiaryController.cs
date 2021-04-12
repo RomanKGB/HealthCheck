@@ -130,11 +130,42 @@ namespace HealthCheck.Controllers
                              select new DiaryEntryCalendar()
                              {
                                  title = dr["entry_text"].ToString(),
-                                 date = dr["entry_date"].ToString()
+                                 date = dr["entry_date"].ToString(),
+                                 backgroundColor = getColor(dr["entry_color"].ToString()),
+                                 id= dr["entry_id"].ToString()
                              }).ToList();
 
                  return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
             });
+        }
+
+        private string getColor(string color_value)
+        {
+            string entry_color = "";
+
+            switch (color_value)
+            {
+                case "1":
+                    entry_color = "red";
+                    break;
+                case "2":
+                    entry_color = "orange";
+                    break;
+                case "3":
+                    entry_color = "yellow";
+                    break;
+                case "4":
+                    entry_color = "green";
+                    break;
+                case "5":
+                    entry_color = "blue";
+                    break;
+                default:
+                    entry_color = "red";
+                    break;
+            }
+
+            return entry_color;        
         }
 
     }

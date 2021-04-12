@@ -94,7 +94,7 @@ export class DiaryCalendar {
   }
 
   ngOnInit() {
-    this.loadEvents("1/1/2021","4/1/2021")
+    this.loadEvents("1/1/2020","4/1/2021")
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
