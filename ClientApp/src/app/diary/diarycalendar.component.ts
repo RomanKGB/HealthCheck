@@ -1,6 +1,6 @@
 import { Component, Inject, ViewChild, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, Calendar } from '@fullcalendar/angular';
+import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, Calendar, FullCalendarComponent } from '@fullcalendar/angular';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
 import { DiaryEntry } from './diary';
 import { ApiResult } from '../base.service';
@@ -17,11 +17,22 @@ import { DiaryEntryCalendar } from './diarycalendar';
   styleUrls: ['./diarycalendar.component.css']
 })
 
+
+
+
+
 export class DiaryCalendar {
   protected http: HttpClient;
   protected baseUrl: string;
   protected posts = [];
-
+  protected selectedDateFrom = new Date("2021/01/01");
+  protected selectedDateTo = new Date();
+  protected startAt = new Date("2021/01/01");
+  protected minDate = new Date('2012/01/01');
+  protected maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
+  protected currentMonth: string = new Date().getMonth().toString();
+  protected DayAndDateFrom: string;
+  
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
     this.http = http;
@@ -31,36 +42,48 @@ export class DiaryCalendar {
 
   calendarVisible = true;
   calendarOptions: CalendarOptions;
-  /*= {
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-    },
-    initialView: 'dayGridMonth',
-    //initialEvents: INITIAL_EVENTS,
-    // alternatively, use the `events` setting to fetch from a feed
-    events: [
-      { title: 'event 1', date: '2021-04-01' },
-      { title: 'event 2', date: '2021-04-02' }
-    ],
-    weekends: true,
-    editable: true,
-    selectable: true,
-    selectMirror: true,
-    dayMaxEvents: true,
-    select: this.handleDateSelect.bind(this),
-    //dateClick: this.handleDateClick.bind(this),
-    eventClick: this.handleEventClick.bind(this),
-    eventsSet: this.handleEvents.bind(this)
-  };
+
+  @ViewChild('calendar') calendarObj: FullCalendarComponent;
+
+  currentEvents: EventApi[] = [];
+
+  
+
+  onSelectDate(event) {
+    this.selectedDateFrom = event;
+    const dateString = event.toDateString();
+    this.currentMonth = new Date(dateString).getMonth.toString();
+
+    const dateValue = dateString.split(' ');
+    
+    this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+    this.loadEvents(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), "4/1/2021")
+    this.calendarObj.getApi().gotoDate(this.selectedDateFrom);
+  }
 
 
-  //currentEvents: EventApi[] = [];//{ title: 'event 1', date: '2019-04-01' },{ title: 'event 2', date: '2019-04-02' };
 
-  //currentEvents.
+  myDateFilter = (d: Date): boolean => {
+    const day = d.getDay();
+    // Prevent Saturday and Sunday from being selected.
+    return true;//day !== 0 && day !== 6;
+  }
 
-  */
+
+  getDayOfWeek(paramD: Date) {
+    var gsDayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    var d = new Date(paramD);
+    return gsDayNames[d.getDay()];
+  }
 
   
 
@@ -86,7 +109,7 @@ export class DiaryCalendar {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
       clickInfo.event.remove();
     }
-    //{ title: 'event 1', date: '2019-04-01' }, { title: 'event 2', date: '2019-04-02' };
+    
   }
 
   handleEvents(events: EventApi[]) {
@@ -108,7 +131,20 @@ export class DiaryCalendar {
     this.http.get<ApiResult<DiaryEntryCalendar>>(url, { params })
       .subscribe(result => {
         this.calendarOptions = {
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+          },
           initialView: 'dayGridMonth',
+          weekends: true,
+          editable: true,
+          selectable: true,
+          selectMirror: true,
+          dayMaxEvents: true,
+          select: this.handleDateSelect.bind(this),
+          eventClick: this.handleEventClick.bind(this),
+          eventsSet: this.handleEvents.bind(this),
           events: result.data
         };
         console.log(result.data);

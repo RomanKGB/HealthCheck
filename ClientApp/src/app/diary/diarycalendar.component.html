@@ -2,12 +2,13 @@
 
   <div class='demo-app-sidebar'>
     <div class='demo-app-sidebar-section'>
-      <h2>Instructions</h2>
-      <ul>
-        <li>Select dates and you will be prompted to create a new event</li>
-        <li>Drag, drop, and resize events</li>
-        <li>Click an event to delete it</li>
-      </ul>
+      <mat-calendar [selected]="selectedDateFrom"
+                    [startAt]="startAt"
+                    [minDate]="minDate"
+                    [maxDate]="maxDate"
+                    [dateFilter]="myDateFilter"
+                    (selectedChange)="onSelectDate($event)">
+      </mat-calendar>
     </div>
     <div class='demo-app-sidebar-section'>
       
@@ -26,8 +27,8 @@
     </div>
   </div>
 
-  <div class='demo-app-main' id="calendar">
-    <full-calendar [options]='calendarOptions'></full-calendar>
+  <div class='demo-app-main'>
+    <full-calendar #calendar [options]='calendarOptions'></full-calendar>
   </div>
 
 </div>
