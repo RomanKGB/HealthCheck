@@ -45,6 +45,7 @@ namespace HealthCheck.Data
         {
             var count = await source.CountAsync();
 
+
             if(!String.IsNullOrEmpty(filterColumn) && !String.IsNullOrEmpty(filterQuery) && IsValidProperty(filterColumn))
             {
                 source = source.Where(String.Format("{0}.Contains(@0)", filterColumn), filterQuery);

@@ -9,11 +9,12 @@ namespace HealthCheck.Data.Models
     {
         public DiaryEntryCalendar()
         { }
-        public DiaryEntryCalendar(string entry_id,string entry_text, string entry_date)
+        public DiaryEntryCalendar(string entry_id,string entry_text, string entry_date,string backgroundColor)
         {
             this.title = entry_text;
             this.date = entry_date;
             this.id = entry_id;
+            this.backgroundColor = backgroundColor;
         }
 
         public string title { get; set; }

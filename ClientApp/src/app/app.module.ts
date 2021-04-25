@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-
+import { MatListModule } from '@angular/material/list';
 import { AppComponent } from './app.component';
 import { BaseFormComponent } from './base.form.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -15,12 +15,14 @@ import { CountriesComponent } from './countries/countries.component';
 import { CountryEditComponent } from './countries/country-edit.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
+import { MatButtonModule } from '@angular/material/button';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
 import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { CityService } from './cities/city.service';
 import { CountryService } from './countries/country.service';
+import { DiaryService } from './diary/diaryservice';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
@@ -33,6 +35,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { DiaryEntryComponent } from './diary/diaryentry.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -51,7 +54,8 @@ FullCalendarModule.registerPlugins([
     CountriesComponent,
     CountryEditComponent,
     DiaryComponent,
-    DiaryCalendar
+    DiaryCalendar,
+    DiaryEntryComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -68,13 +72,16 @@ FullCalendarModule.registerPlugins([
           { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'diary', component: DiaryComponent },
-          { path: 'calendar', component:DiaryCalendar }
+          { path: 'calendar', component: DiaryCalendar },
+          { path: 'diaryentry/:entryid', component: DiaryEntryComponent }
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,
       AngularMaterialModule,
       MatDatepickerModule,
       MatGridListModule,
+      MatListModule,
+      MatButtonModule,
       MatNativeDateModule,
       FullCalendarModule,
       ReactiveFormsModule,
@@ -83,7 +90,7 @@ FullCalendarModule.registerPlugins([
         useFactory: adapterFactory
       })
   ],
-  providers: [CityService, CountryService, DiaryComponent, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }],
+  providers: [CityService, CountryService, DiaryComponent, DiaryService, { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -51,6 +51,8 @@
     <None Remove="ClientApp\src\app\diary\diary.ts" />
     <None Remove="ClientApp\src\app\diary\diarycalendar.component.ts" />
     <None Remove="ClientApp\src\app\diary\diarycalendar.ts" />
+    <None Remove="ClientApp\src\app\diary\diaryentry.component.ts" />
+    <None Remove="ClientApp\src\app\diary\diaryservice.ts" />
     <None Remove="ClientApp\src\app\diary\event-utils.ts" />
   </ItemGroup>
 
@@ -77,6 +79,8 @@
     <TypeScriptCompile Include="ClientApp\src\app\diary\diary.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diary.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diarycalendar.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\diary\diaryentry.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\diary\diaryservice.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\event-utils.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diarycalendar.ts" />
   </ItemGroup>

@@ -5,7 +5,11 @@ import { INITIAL_EVENTS, createEventId } from './event-utils';
 import { DiaryEntry } from './diary';
 import { ApiResult } from '../base.service';
 import { DiaryEntryCalendar } from './diarycalendar';
-
+import { MatDialog } from '@angular/material/dialog';
+import { DiaryComponent } from './diary.component';
+import { DiaryEntryComponent } from './diaryentry.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl } from '@angular/forms'
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +27,7 @@ import { DiaryEntryCalendar } from './diarycalendar';
 
 export class DiaryCalendar {
   protected http: HttpClient;
-  protected baseUrl: string;
+  protected baseUrl: string;private 
   protected posts = [];
   protected selectedDateFrom = new Date("2021/01/01");
   protected selectedDateTo = new Date();
@@ -32,14 +36,20 @@ export class DiaryCalendar {
   protected maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
   protected currentMonth: string = new Date().getMonth().toString();
   protected DayAndDateFrom: string;
+  protected dlg: MatDialog;
+  date = new FormControl(new Date());
   
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private router: Router) {
     this.baseUrl = baseUrl;
     this.http = http;
-    //this.onSelectTo(this.selectedDate);
+    
   }
-
-
+  /*constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private cityService: CityService
+  ) { super(); }
+  */
   calendarVisible = true;
   calendarOptions: CalendarOptions;
 
@@ -92,6 +102,9 @@ export class DiaryCalendar {
     const title = prompt('Please enter a new title for your event');
     const calendarApi = selectInfo.view.calendar;
 
+    //need to create a new component to edit entries
+    //this.dlg.open(new DiaryEntryComponent(this.http, this.baseUrl);
+
     calendarApi.unselect(); // clear date selection
 
     if (title) {
@@ -106,9 +119,10 @@ export class DiaryCalendar {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      clickInfo.event.remove();
-    }
+    /*this.dlg.open(DiaryEntryComponent, {
+      data: { id: clickInfo.event.id, title: clickInfo.event.title, date: clickInfo.event.start, color: clickInfo.event.backgroundColor },
+    });*/
+    this.router.navigate(['/diaryentry', clickInfo.event.id]);
     
   }
 
