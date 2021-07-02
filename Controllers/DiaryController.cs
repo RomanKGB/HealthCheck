@@ -119,9 +119,12 @@ namespace HealthCheck.Controllers
 
             return await Task.Run(() =>
             {
-                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
-                    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
+                //string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
+                //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
 
+                string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(a.activity_points),0) as days_points,d.entry_date,d.entry_date_int from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
+                + "left outer join activity a on a.activity_id = da.activity_id where convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "') "
+                + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int";
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
                 List<DiaryEntryCalendar> diaryList = new List<DiaryEntryCalendar>();
@@ -130,23 +133,169 @@ namespace HealthCheck.Controllers
                              {
                                  title = dr["entry_text"].ToString(),
                                  date = dr["entry_date"].ToString(),
-                                 backgroundColor = getColor(dr["entry_color"].ToString()),
+                                 backgroundColor = getColor(dr["days_points"].ToString()),
                                  id= dr["entry_id"].ToString()
                              }).ToList();
 
-                 return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); ;
+                 return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); 
+            });
+        }
+
+        [HttpGet]
+        [Route("getactivities")]
+        public async Task<ActionResult<ApiResult<Activity>>> GetActivities(string entry_id)
+        {
+
+            return await Task.Run(() =>
+            {
+                string strSQL = "select activity_id,activity_name,activity_points from activity where activity_id not in (select activity_id from diary_activities where entry_id="+entry_id+")";
+
+
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<Activity> activityList = new List<Activity>();
+                activityList = (from DataRow dr in dbTable.Rows
+                             select new Activity()
+                             {
+                                 activity_id = Int32.Parse(dr["activity_id"].ToString()),
+                                 activity_name = dr["activity_name"].ToString(),
+                                 activity_points = Int32.Parse(dr["activity_points"].ToString()),
+                                 done=0
+                             }).ToList();
+
+                return new ApiResult<Activity>(activityList, activityList.Count,1,100,null,null,null,null); 
+            });
+        }
+
+        [HttpGet]
+        [Route("getentryactivities")]
+        public async Task<ActionResult<ApiResult<Activity>>> GetEntryActivities(int entry_id)
+        {
+
+            return await Task.Run(() =>
+            {
+                string strSQL = "select a.activity_id  as activity_id,a.activity_name,a.activity_points,da.done from "
+                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id = "+entry_id;
+
+
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<Activity> activityList = new List<Activity>();
+                activityList = (from DataRow dr in dbTable.Rows
+                                select new Activity()
+                                {
+                                    activity_id = Int32.Parse(dr["activity_id"].ToString()),
+                                    activity_name = dr["activity_name"].ToString(),
+                                    activity_points = Int32.Parse(dr["activity_points"].ToString()),
+                                    done = Int32.Parse(dr["done"].ToString())
+                                }).ToList();
+
+                return new ApiResult<Activity>(activityList, activityList.Count, 0, 0, "", "", "", "");
             });
         }
 
         [HttpPost]
         [Route("addactivity")]
-        public async Task<ActionResult<bool>> AddActivity(int entry_id,int activity_id)
+        public async Task<ActionResult<bool>> AddActivity(int entry_id,string activity_id)
         {
             return await Task.Run(() =>
             {
-                string strSQL = "insert into diary_activities (activity_id,entry_id) values (" + activity_id + "," + entry_id + ")";
-                
-                return dbLayer.ExecuteSQL(strSQL); 
+                string strSQL = "";
+                bool allok = false;
+                string[] arrVariables=activity_id.Split(",");
+
+                for (int i = 0; i < arrVariables.Length-1; i++)
+                {
+                    strSQL = "insert into diary_activities (activity_id,entry_id) values (" + arrVariables[i] + "," + entry_id + ")";
+                    allok= dbLayer.ExecuteSQL(strSQL);
+                }
+                return allok; 
+            });
+        }
+
+        [HttpPost]
+        [Route("addnewentry")]
+        public async Task<ActionResult<int>> AddNewEntry(string entry_date)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL;
+                bool allok = false ;
+                int retVal = 0;
+
+                DataTable dbTable =dbLayer.ExecuteQuery("SELECT entry_id from diary where entry_date='"+entry_date+"'");
+                if (dbTable.Rows.Count > 0) retVal = int.Parse(dbTable.Rows[0]["entry_id"].ToString());
+                else
+                {
+                    dbTable = dbLayer.ExecuteQuery("SELECT MAX(entry_id) as max_id from diary");
+                    if (dbTable.Rows.Count > 0) retVal = int.Parse(dbTable.Rows[0]["max_id"].ToString());
+                    retVal += 1;
+                    strSQL = "insert into diary (entry_id,entry_text,entry_date,entry_date_int) values (" + retVal.ToString() + ",'Please enter comments for " + entry_date + "','"
+                        + entry_date + "',datediff(second,'1969/12/31 00:00:00','" + entry_date + " 00:00:00'))";
+
+                    allok = dbLayer.ExecuteSQL(strSQL);
+                }
+                return retVal;
+            });
+        }
+
+        [HttpPost]
+        [Route("deleteactivity")]
+        public async Task<ActionResult<bool>> DeleteActivity(int entry_id, string activity_id)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "";
+                bool allok = false;
+                string[] arrVariables = activity_id.Split(",");
+
+                for (int i = 0; i < arrVariables.Length - 1; i++)
+                {
+                    strSQL = "delete from diary_activities where activity_id=" + arrVariables[i] + " and entry_id=" + entry_id;
+                    allok = dbLayer.ExecuteSQL(strSQL);
+                }
+                return allok;
+            });
+        }
+
+        [HttpPost]
+        [Route("markdone")]
+        public async Task<ActionResult<bool>> MarkDone(int entry_id, string activity_id,int is_done)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "";
+                bool allok = false;
+                string[] arrVariables = activity_id.Split(",");
+
+                for (int i = 0; i < arrVariables.Length - 1; i++)
+                {
+                    strSQL = "update diary_activities set done="+is_done+" where activity_id=" + arrVariables[i] + " and entry_id=" + entry_id;
+                    allok = dbLayer.ExecuteSQL(strSQL);
+                }
+                return allok;
+            });
+        }
+
+        [HttpPost]
+        [Route("addnewactivity")]
+        public async Task<ActionResult<bool>> AddNewActivity(string activity_name, int activity_points )
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "insert into activity (activity_name,activity_points) values ('" + activity_name + "'," + activity_points + ")";
+
+                return dbLayer.ExecuteSQL(strSQL);
+            });
+        }
+
+        [HttpPost]
+        [Route("updatecomment")]
+        public async Task<ActionResult<bool>> UpdateComment(string comment, int entry_id)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "update diary set entry_text='" + comment.Replace("'", "''") + "' where entry_id=" + entry_id;
+
+                return dbLayer.ExecuteSQL(strSQL);
             });
         }
 
@@ -174,31 +323,13 @@ namespace HealthCheck.Controllers
 
         private string getColor(string color_value)
         {
-            string entry_color = "";
+            int days_points = int.Parse(color_value);
 
-            switch (color_value)
-            {
-                case "1":
-                    entry_color = "red";
-                    break;
-                case "2":
-                    entry_color = "orange";
-                    break;
-                case "3":
-                    entry_color = "yellow";
-                    break;
-                case "4":
-                    entry_color = "green";
-                    break;
-                case "5":
-                    entry_color = "blue";
-                    break;
-                default:
-                    entry_color = "red";
-                    break;
-            }
-
-            return entry_color;        
+            if (days_points >= 150) return "blue";
+            if (days_points >= 139) return "green";
+            if (days_points >= 129) return "yellow";
+            if (days_points >= 119) return "orange";
+            else return "red";
         }
 
     }

@@ -2,74 +2,90 @@
   <h1>Edit Diary Entry</h1>
 
   <p *ngIf="this.entryid && !diaryEntry"><em>Loading entry...</em></p>
-
-
-    
-
-  <div class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+   
     <table border="1" width="100%" cellspacing="3" cellpadding="3">
       <tr>
-        <td>
-          <mat-form-field appearance="fill">
-            <mat-label>Diary Entry date</mat-label>
-            <input matInput [matDatepicker]="picker1" [formControl]="selectedDate">
-            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-            <mat-datepicker #picker1></mat-datepicker>
-          </mat-form-field>
-          <div *ngIf="form.invalid && form.errors" class="alert alert-danger">
-            <strong>ERROR</strong>:A city with the same parameters (name,lon,lat,country) already exists
-          </div>
-          <div class="form-group">
-            <label for="title">Comment:</label>
-            <br />
-            <textarea id="title" formControlName="title" cols="100" rows="10" required placeholder="City name..." class="form-control"></textarea>
-            <div *ngIf="hasError('title')" class="invalid-feedback">
-              <div *ngIf="form.get('title').errors?.required">
-                Title is required
+        <td colspan="2">{{user_message}}</td>
+      </tr>
+      <tr>
+        <td align="left" valign="top">
+          <div class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="fill">
+              <mat-label>Diary Entry date</mat-label>
+              <input matInput [matDatepicker]="picker1" [formControl]="selectedDate">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+            {{completed+" out of "+planned}}
+            <div class="form-group">
+              <label for="title">Comment for {{display_date}}:</label>
+              <br />
+              <textarea id="title" formControlName="title" cols="100" rows="10" required placeholder="City name..." class="form-control"></textarea>
+              <div *ngIf="hasError('title')" class="invalid-feedback">
+                <div *ngIf="form.get('title').errors?.required">
+                  Title is required
+                </div>
               </div>
+              <button *ngIf="this.entryid" mat-raised-button color="primary" [disabled]="form.invalid" (click)="updateComment()">Update Comment</button>
+              <button *ngIf="!this.entryid" mat-raised-button color="primary" [disabled]="form.invalid" (click)="createNew()">Create Entry</button>
+              <button mat-raised-button color="primary" [routerLink]="['/calendar']">Cancel</button>
+            </div>
+            <div class="form-group">
+
+              <table mat-table [dataSource]="activitiesList2" class="mat-elevation-z8" [hidden]="!activitiesList2" matSort (matSortChange)="loadData()" width="100%">
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                  [checked]="selection.hasValue() && isAllSelected()"
+                                  [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                  [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let activity">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                  (change)="$event ? selection.toggle(activity) : null"
+                                  [checked]="selection.isSelected(activity)"
+                                  [aria-label]="checkboxLabel(activity)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="id">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                  <td mat-cell *matCellDef="let activity">{{activity.activity_id}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+                  <td mat-cell *matCellDef="let activity">
+                    {{activity.activity_name}}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="points">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Points</th>
+                  <td mat-cell *matCellDef="let activity">{{activity.activity_points}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="done">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Done</th>
+                  <td mat-cell *matCellDef="let activity">{{formatActivityValue(activity.done)}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns:displayedColumns;"></tr>
+              </table>
+              <button mat-raised-button color="primary" (click)="markDone(1)">Done</button>
+              <button mat-raised-button color="primary" (click)="markDone(0)">Not Done</button>
+              <button mat-raised-button color="primary" (click)="deleteSelected()">Remove activities</button>
             </div>
           </div>
-          <div class="form-group">
-
-            <table mat-table [dataSource]="activitiesList" class="mat-elevation-z8" [hidden]="!activitiesList" matSort (matSortChange)="loadData()">
-
-              <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-                <td mat-cell *matCellDef="let activity">{{activity.id}}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-                <td mat-cell *matCellDef="let activity">
-                  <a [routerLink]="['/city',activity.id]">{{activity.description}}</a>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="points">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Points</th>
-                <td mat-cell *matCellDef="let activity">{{activity.points}}</td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns:displayedColumns;"></tr>
-            </table>
-
-
-
-            <button mat-raised-button color="primary">Remove activities</button>
-          </div>
-            <div class="form-group-commands">
-              <button *ngIf="this.entryid" type="submit" (click)="onSubmit()" [disabled]="form.invalid" class="btn-success">Save City</button>
-              <button *ngIf="!this.entryid" type="submit" (click)="onSubmit()" [disabled]="form.invalid" class="btn-success">Create City</button>
-              <button type="submit" [routerLink]="['/calendar']" class="btn-primary btn-default">Cancel</button>
-            </div>
         </td>
-        <td align="center" valign="top">
+       <td align="center" valign="top">
+        <div class="form" [formGroup]="formNewActivity" (ngSubmit)="onSubmit()">
           <div class="form-group">
-
-            <input type="text" id="new_activity_name" formControlName="new_activity_name" required placeholder="Activity name..." class="form-control" />
+           <input type="text" id="new_activity_name" formControlName="new_activity_name" required placeholder="Activity name..." class="form-control" />
             <div *ngIf="hasError('new_activity_name')" class="invalid-feedback">
-              <div *ngIf="form.get('new_activity_name').errors?.required">
+              <div *ngIf="formNewActivity.get('new_activity_name').errors?.required">
                 Activity name is required
               </div>
             </div>
@@ -77,20 +93,20 @@
 
           <div class="form-group">
 
-            <input type="text" id="new_activity_points" formControlName="new_activity_points" required placeholder="City latitude..." class="form-control" />
+            <input type="text" id="new_activity_points" formControlName="new_activity_points" required placeholder="Points..." class="form-control" />
             <div *ngIf="hasError('new_activity_points')" class="invalid-feedback">
-              <div *ngIf="form.get('new_activity_points').errors?.required">
+              <div *ngIf="formNewActivity.get('new_activity_points').errors?.required">
                 Points is required
               </div>
-              <div *ngIf="form.get('new_activity_points').errors?.pattern">
+              <div *ngIf="formNewActivity.get('new_activity_points').errors?.pattern">
                 Points should be numeric
               </div>
             </div>
           </div>
-          <button mat-raised-button color="primary">Add New Activity</button>
+          <button mat-raised-button color="primary" [disabled]="formNewActivity.invalid" (click)="onAddNewActivity($event)">Add New Activity</button>
           <mat-selection-list #activities_list formControlName="activities_list" (selectionChange)="onActivitiesSelectChange($event)">
-            <mat-list-option *ngFor="let activity of activitiesList" [value]="activity.id">
-              {{activity.description}}-({{activity.points}})
+            <mat-list-option *ngFor="let activity of activitiesList" [value]="activity.activity_id">
+              {{activity.activity_name}}-({{activity.activity_points}})
             </mat-list-option>
           </mat-selection-list>
 
@@ -98,17 +114,10 @@
             Options selected: {{activities_list.selectedOptions.selected.length}}
           </p>
           <button mat-raised-button color="primary" (click)="onAddToTodayClick($event)">Add to today</button>
+          </div>
         </td>
         </tr>
      </table>
-
-
-
-
-
-
-
-    
   </div>
 
-</div>
+

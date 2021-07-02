@@ -73,7 +73,8 @@ FullCalendarModule.registerPlugins([
           { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
           { path: 'diary', component: DiaryComponent },
           { path: 'calendar', component: DiaryCalendar },
-          { path: 'diaryentry/:entryid', component: DiaryEntryComponent }
+          { path: 'diaryentry/:entryid', component: DiaryEntryComponent },
+          { path: 'diaryentry', component: DiaryEntryComponent }
         ]),
       ServiceWorkerModule.register('ngsw-worker.js', { registrationStrategy:'registerImmediately' }),
       BrowserAnimationsModule,

@@ -10,6 +10,7 @@ import { DiaryComponent } from './diary.component';
 import { DiaryEntryComponent } from './diaryentry.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms'
+import { DiaryService } from './diaryservice';
 
 @Injectable({
   providedIn: 'root',
@@ -23,23 +24,26 @@ import { FormControl } from '@angular/forms'
 
 
 
-
+  
 
 export class DiaryCalendar {
   protected http: HttpClient;
   protected baseUrl: string;private 
   protected posts = [];
   protected selectedDateFrom = new Date("2021/01/01");
+  protected newDateFrom = new Date();
+  public newFormattedDate: string = new Date().toLocaleDateString("en-US").toString();
   protected selectedDateTo = new Date();
   protected startAt = new Date("2021/01/01");
   protected minDate = new Date('2012/01/01');
   protected maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
   protected currentMonth: string = new Date().getMonth().toString();
   protected DayAndDateFrom: string;
+ 
   protected dlg: MatDialog;
   date = new FormControl(new Date());
-  
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private router: Router) {
+
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private router: Router, private diaryService: DiaryService) {
     this.baseUrl = baseUrl;
     this.http = http;
     
@@ -95,7 +99,13 @@ export class DiaryCalendar {
     return gsDayNames[d.getDay()];
   }
 
-  
+  onSelectNewDate(event) {
+    //console.log(event);
+    this.newDateFrom = event;
+    const dateString = event.toDateString();
+    this.newFormattedDate = new Date(this.newDateFrom).toLocaleDateString("en-US").toString();
+    
+  }
 
 
   handleDateSelect(selectInfo: DateSelectArg) {
@@ -130,8 +140,14 @@ export class DiaryCalendar {
     //this.currentEvents = events;
   }
 
+  createNew() {
+    this.diaryService.addNewEntry(this.newFormattedDate).subscribe(result => {
+      this.router.navigate(['/diaryentry', result]);
+    }, error => console.error(error));
+  }
+
   ngOnInit() {
-    this.loadEvents("1/1/2020","4/1/2021")
+    this.loadEvents("1/1/2020","12/1/2021")
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
@@ -147,8 +163,7 @@ export class DiaryCalendar {
         this.calendarOptions = {
           headerToolbar: {
             left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            center: 'title'
           },
           initialView: 'dayGridMonth',
           weekends: true,

@@ -47,6 +47,7 @@
     <None Remove="ClientApp\src\app\countries\country-edit.component.ts" />
     <None Remove="ClientApp\src\app\countries\country.service.ts" />
     <None Remove="ClientApp\src\app\countries\country.ts" />
+    <None Remove="ClientApp\src\app\diary\activity.ts" />
     <None Remove="ClientApp\src\app\diary\diary.component.ts" />
     <None Remove="ClientApp\src\app\diary\diary.ts" />
     <None Remove="ClientApp\src\app\diary\diarycalendar.component.ts" />
@@ -76,6 +77,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\countries\country-edit.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\countries\country.service.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\countries\country.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\diary\activity.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diary.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diary.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\diary\diarycalendar.component.ts" />

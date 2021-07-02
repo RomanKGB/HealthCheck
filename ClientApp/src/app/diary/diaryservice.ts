@@ -54,13 +54,38 @@ export class DiaryService extends BaseService {
     return this.http.post<City>(url, item);
   }
 
-  addActivityToEntry(entry_id: number, activity_id: number): Observable<boolean>  {
+  addActivityToEntry(entry_id: number, activity_id: string): Observable<boolean>  {
     var url = this.baseUrl + "api/diary/addactivity?entry_id=" + entry_id + "&activity_id=" + activity_id;
-    //var params = new HttpParams()
-    //  .append("entry_id", entry_id.toString())
-    //  .append("activity_id", activity_id.toString())
     return this.http.post<boolean>(url, null);
      
+  }
+
+  deleteActivitiesFromEntry(entry_id: number, activity_id: string): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/deleteactivity?entry_id=" + entry_id + "&activity_id=" + activity_id;
+    return this.http.post<boolean>(url, null);
+
+  }
+
+  markDone(entry_id: number, activity_id: string, is_done: number): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/markdone?entry_id=" + entry_id + "&activity_id=" + activity_id + "&is_done=" + is_done;
+    return this.http.post<boolean>(url, null);
+
+  }
+
+  addNewActivity(activity_name: string, activity_points: number): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/addnewactivity?activity_name=" + activity_name + "&activity_points=" + activity_points;
+    return this.http.post<boolean>(url, null);
+  }
+
+  addNewEntry(entry_date:string): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/addnewentry?entry_date="+entry_date;
+    return this.http.post<boolean>(url, null);
+  }
+
+  updateComment(comment: string, entry_id: number): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/updatecomment?comment=" + comment + "&entry_id=" + entry_id;
+    return this.http.post<boolean>(url, null);
+
   }
 
   getCountries<ApiResult>(
@@ -105,6 +130,24 @@ export class DiaryService extends BaseService {
         .set("filterQuery", filterQuery)
         .set("filterColumn", filterColumn);
     }
+
+    return this.http.get<ApiResult>(url, { params });
+  }
+
+  getActivities<ApiResult>(entry_id:string): Observable<ApiResult> {
+    var url = this.baseUrl + 'api/diary/getactivities';
+    var params = new HttpParams()
+      .set("entry_id", entry_id)
+      
+    
+    return this.http.get<ApiResult>(url, { params });
+  }
+
+  getEntryActivities<ApiResult>(entry_id:string): Observable<ApiResult> {
+    var url = this.baseUrl + 'api/diary/getentryactivities';
+    var params = new HttpParams()
+      .set("entry_id", entry_id)
+      
 
     return this.http.get<ApiResult>(url, { params });
   }

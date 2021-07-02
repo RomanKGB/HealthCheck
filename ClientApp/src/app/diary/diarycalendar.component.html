@@ -11,7 +11,14 @@
       </mat-calendar>
     </div>
     <div class='demo-app-sidebar-section'>
-      
+      Create New Entry for:{{newFormattedDate}}
+      <mat-calendar [selected]="newDateFrom"
+                    [minDate]="minDate"
+                    [maxDate]="maxDate"
+                    [dateFilter]="myDateFilter"
+                    (selectedChange)="onSelectNewDate($event)">
+      </mat-calendar>
+      <button mat-raised-button color="primary" (click)="createNew()">New Entry</button>
     </div>
     <div class='demo-app-sidebar-section'>
       
