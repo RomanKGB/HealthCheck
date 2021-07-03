@@ -70,36 +70,33 @@ namespace HealthCheck.Controllers
             string dateTo=null
             )
         {
-            string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where " 
-                + "convert(date, entry_date) between convert(date, '"+ dateFrom+"') and convert(date, '"+dateTo+"')";
-            IQueryable<DiaryEntry> dbSetLocal = _context.DiaryEntries.FromSqlRaw<DiaryEntry>(strSQL);
-            try
-            {
-                return await ApiResult<DiaryEntryDTO>.CreateAsync(
-                    dbSetLocal
-                    .Select(c => new DiaryEntryDTO()
-                    {
-                        entry_id = c.entry_id,
-                        entry_text = c.entry_text,
-                        entry_date = c.entry_date,
-                        entry_color = c.entry_color.ToString()
-                    //TotalEntries = _context.DiaryEntries.Count<DiaryEntry>
-                    }),
-                    pageIndex,
-                    pageSize,
-                    sortColumn,
-                    sortOrder,
-                    filterColumn,
-                    filterQuery
-                    );
-            }
-            catch(System.InvalidCastException e)
-            {
 
-                Console.WriteLine(e.Message);
-                return null;
-                
-            }
+            return await Task.Run(() =>
+            {
+                //string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
+                //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
+
+                string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(a.activity_points),0) as days_points,d.entry_date,d.entry_date_int from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
+                + "left outer join activity a on a.activity_id = da.activity_id where convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "') "
+                + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int";
+
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<DiaryEntryDTO> diaryList = new List<DiaryEntryDTO>();
+                diaryList = (from DataRow dr in dbTable.Rows
+                             select new DiaryEntryDTO()
+                             {
+                                 entry_id = int.Parse(dr["entry_id"].ToString()),
+                                 entry_date = dr["entry_date"].ToString(),
+                                 entry_color = getColor(dr["days_points"].ToString()),
+                                 entry_text = dr["entry_text"].ToString(),
+                                 total_points= int.Parse(dr["days_points"].ToString())
+                             }).ToList();
+
+                return new ApiResult<DiaryEntryDTO>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
+            });
+            
+
+
 
         }
 
@@ -122,7 +119,9 @@ namespace HealthCheck.Controllers
                 //string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
                 //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
 
-                string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(a.activity_points),0) as days_points,d.entry_date,d.entry_date_int from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
+                string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(case da.done when 1 then a.activity_points else 0 end),0) as days_points,"
+                + "isnull(SUM(a.activity_points), 0) as days_planned_points,isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id),0) as num_activities,dbo.fnFormatDate (d.entry_date, 'YYYY-MM-DD') as entry_date,d.entry_date_int "
+                + "from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
                 + "left outer join activity a on a.activity_id = da.activity_id where convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "') "
                 + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int";
 
@@ -131,7 +130,7 @@ namespace HealthCheck.Controllers
                 diaryList = (from DataRow dr in dbTable.Rows
                              select new DiaryEntryCalendar()
                              {
-                                 title = dr["entry_text"].ToString(),
+                                 title = dr["days_points"].ToString()+"/"+ dr["days_planned_points"].ToString()+"  -  "+dr["done_activities"].ToString() + "/" + dr["num_activities"].ToString(),
                                  date = dr["entry_date"].ToString(),
                                  backgroundColor = getColor(dr["days_points"].ToString()),
                                  id= dr["entry_id"].ToString()
@@ -148,7 +147,13 @@ namespace HealthCheck.Controllers
 
             return await Task.Run(() =>
             {
-                string strSQL = "select activity_id,activity_name,activity_points from activity where activity_id not in (select activity_id from diary_activities where entry_id="+entry_id+")";
+                //string strSQL = "select activity_id,activity_name,activity_points from activity where activity_id not in (select activity_id from diary_activities where entry_id="+entry_id+") order by activity_name";
+
+                string strSQL = "select a.activity_id,activity_name,activity_points,count(da.activity_id) as times_added from activity a "
+                    + "left outer join diary_activities da on a.activity_id = da.activity_id "
+                    + "where a.activity_id not in (select activity_id from diary_activities where entry_id = "+entry_id+") "
+                    + "group by a.activity_id,activity_name,activity_points "
+                    + "order by times_added desc,activity_name";
 
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
@@ -174,7 +179,7 @@ namespace HealthCheck.Controllers
             return await Task.Run(() =>
             {
                 string strSQL = "select a.activity_id  as activity_id,a.activity_name,a.activity_points,da.done from "
-                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id = "+entry_id;
+                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id = "+entry_id +" order by activity_name";
 
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
@@ -220,8 +225,9 @@ namespace HealthCheck.Controllers
                 string strSQL;
                 bool allok = false ;
                 int retVal = 0;
-
-                DataTable dbTable =dbLayer.ExecuteQuery("SELECT entry_id from diary where entry_date='"+entry_date+"'");
+                DateTime dateFromString = DateTime.Parse(entry_date, System.Globalization.CultureInfo.InvariantCulture);
+                dateFromString.ToString("MM/dd/yyyy");
+                DataTable dbTable =dbLayer.ExecuteQuery("SELECT entry_id from diary where convert(date,entry_date)=convert(date,'"+ dateFromString.ToString("MM/dd/yyyy") + "')");
                 if (dbTable.Rows.Count > 0) retVal = int.Parse(dbTable.Rows[0]["entry_id"].ToString());
                 else
                 {
@@ -289,11 +295,11 @@ namespace HealthCheck.Controllers
 
         [HttpPost]
         [Route("updatecomment")]
-        public async Task<ActionResult<bool>> UpdateComment(string comment, int entry_id)
+        public async Task<ActionResult<bool>> UpdateComment(string comment, int weight,int entry_id)
         {
             return await Task.Run(() =>
             {
-                string strSQL = "update diary set entry_text='" + comment.Replace("'", "''") + "' where entry_id=" + entry_id;
+                string strSQL = "update diary set entry_text='" + comment.Replace("'", "''") + "',my_weight="+ weight + " where entry_id=" + entry_id;
 
                 return dbLayer.ExecuteSQL(strSQL);
             });
@@ -304,7 +310,7 @@ namespace HealthCheck.Controllers
         {
             return await Task.Run(() =>
             {
-                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
+                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int,my_weight from vDiary where "
                     + "entry_id=" + id;
                 DiaryEntryCalendar diaryEntry = new DiaryEntryCalendar();
 
@@ -315,6 +321,7 @@ namespace HealthCheck.Controllers
                     diaryEntry.title = dbTable.Rows[0]["entry_text"].ToString();
                     diaryEntry.date = dbTable.Rows[0]["entry_date"].ToString();
                     diaryEntry.backgroundColor=dbTable.Rows[0]["entry_color"].ToString();
+                    diaryEntry.weight = int.Parse(dbTable.Rows[0]["my_weight"].ToString());
                 }
                 catch (Exception e) { Console.Write(e.Message); }
                 return diaryEntry;

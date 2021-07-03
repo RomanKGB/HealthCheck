@@ -50,3 +50,11 @@ section {
   justify-content: center;
   width: 120px;
 }
+
+.red {
+  background-color: red;
+}
+
+.blue {
+  background-color: blue;
+}

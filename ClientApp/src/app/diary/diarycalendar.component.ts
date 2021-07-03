@@ -34,7 +34,7 @@ export class DiaryCalendar {
   protected newDateFrom = new Date();
   public newFormattedDate: string = new Date().toLocaleDateString("en-US").toString();
   protected selectedDateTo = new Date();
-  protected startAt = new Date("2021/01/01");
+  protected startAt = new Date("2000/01/01");
   protected minDate = new Date('2012/01/01');
   protected maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
   protected currentMonth: string = new Date().getMonth().toString();
@@ -109,9 +109,27 @@ export class DiaryCalendar {
 
 
   handleDateSelect(selectInfo: DateSelectArg) {
-    const title = prompt('Please enter a new title for your event');
-    const calendarApi = selectInfo.view.calendar;
+    console.log(selectInfo);
+    var selected_date = selectInfo.startStr;//.toLocaleDateString("en-US").toString();
+    console.log(selected_date);
+    this.newFormattedDate = selected_date;
+    this.createNew();
 
+
+    //this.selectedDateTo = event;
+    //const dateString = selectInfo.startStr.toDateString();
+    //console.log(new Date().toLocaleDateString("en-US").toString());
+    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    //const dateValue = dateString.split(' ');
+    //this.yearTo = dateValue[3];
+    //this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
+
+    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    //new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString();
+
+    /*const title = prompt('Please enter a new title for your event');
+    const calendarApi = selectInfo.view.calendar;
+    var selected_date=new Date(selectInfo.startStr).toLocaleDateString("en-US").toString();
     //need to create a new component to edit entries
     //this.dlg.open(new DiaryEntryComponent(this.http, this.baseUrl);
 
@@ -125,7 +143,7 @@ export class DiaryCalendar {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
       });
-    }
+    }*/
   }
 
   handleEventClick(clickInfo: EventClickArg) {
@@ -147,7 +165,7 @@ export class DiaryCalendar {
   }
 
   ngOnInit() {
-    this.loadEvents("1/1/2020","12/1/2021")
+    this.loadEvents("1/1/2000","12/1/2021")
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {

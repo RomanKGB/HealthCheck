@@ -33,10 +33,12 @@ export class DiaryEntryComponent extends BaseFormComponent{
   diaryEntry: DiaryEntryCalendar;
   selectedDate = new FormControl(new Date());
   display_date: string = "";
+  display_day_date: string = "";
   activitiesList: any;
   activitiesList2:any;
   activities_list: MatList;
   selected_activites: MatListOption[];
+  selection_string:string = "";
   selection = new SelectionModel<Activity>(true, []);
   @ViewChild('todays_tasks') firstListObj: MatList;
 
@@ -44,16 +46,14 @@ export class DiaryEntryComponent extends BaseFormComponent{
     private activatedRoute: ActivatedRoute, private router: Router,
     private diaryService: DiaryService) {
     super();
-    //this.baseUrl = baseUrl;
-    //this.http = http;
-    //this.entryid = data.id;
+    
     
   }
 
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl('', Validators.required),
-      //entry_color: new FormControl('', Validators.required),
+      weight: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
       date: new FormControl('')
     }, null, null);
     this.formNewActivity = new FormGroup({
@@ -73,9 +73,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   }
 
   isAllSelected() {
-    //console.log("Check All Selected");
     const numSelected = this.selection.selected.length;
-    //const numRows=0;
     try {
       const numRows = this.activitiesList2.length;
       return numSelected === numRows;
@@ -94,8 +92,8 @@ export class DiaryEntryComponent extends BaseFormComponent{
   }
 
   updateComment() {
-    console.log(this.form.get('title').value);
-    this.diaryService.updateComment(this.form.get('title').value, parseInt(this.entryid)).subscribe(result => {
+    //console.log(this.form.get('title').value);
+    this.diaryService.updateComment(this.form.get('title').value, this.form.get('weight').value, parseInt(this.entryid)).subscribe(result => {
       if (result) this.user_message="Saved comment..";
       else this.user_message = "Error saving..";
     }, error => console.error(error));
@@ -126,30 +124,55 @@ export class DiaryEntryComponent extends BaseFormComponent{
     if (!activity) {
       return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
     }
-    return `${this.selection.isSelected(activity) ? 'deselect' : 'select'} row ${activity.activity_id + 1}`;
+    return `${this.selection.isSelected(activity) ? 'deselect' : 'select'} activity ${activity.activity_id + 1}`;
     
   }
 
   deleteSelected() {
-    var selected_activities = "";
-    this.selection.selected.map(a => selected_activities += a.activity_id.toString() + ",");
-    this.diaryService.deleteActivitiesFromEntry(parseInt(this.entryid),selected_activities).subscribe(result => {
+    var selected_activities_local = "";
+    this.selection.selected.map(a => selected_activities_local += a.activity_id.toString() + ",");
+    this.diaryService.deleteActivitiesFromEntry(parseInt(this.entryid), selected_activities_local).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();
+      this.selection.clear();
       this.user_message = "Selected actitvities deleted...";
     }, error => console.error(error));
   }
 
   markDone(is_done:number) {
-    var selected_activities = "";
-    this.selection.selected.map(a => selected_activities += a.activity_id.toString()+",");
-    this.diaryService.markDone(parseInt(this.entryid), selected_activities, is_done).subscribe(result => {
+    var selected_activities_local = "";
+    this.selection.selected.map(a => selected_activities_local += a.activity_id.toString() + ",");
+    this.diaryService.markDone(parseInt(this.entryid), selected_activities_local, is_done).subscribe(result => {
       this.loadEntryActivities(); 
+      this.selection.clear();
       this.user_message = "Activity status updated...";
     }, error => console.error(error));
   }
 
-  
+  addDays(num_days: number, old_date: string) {
+    //console.log("--"+old_date);
+    var date = new Date(old_date);
+    //console.log("--" + date.toLocaleDateString("en-US").toString());
+    //console.log("--" +num_days);
+    date.setDate(date.getDate() + num_days);
+    //console.log("--" +date);
+    return date.toLocaleDateString("en-US").toString();
+  }
+
+  getDayOfWeek(paramD: Date) {
+    var gsDayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    var d = new Date(paramD);
+    return gsDayNames[(d.getDay() == 6 ? 0 : d.getDay()+1)];
+  }
 
   loadData() {
 
@@ -158,13 +181,12 @@ export class DiaryEntryComponent extends BaseFormComponent{
     }
     catch { }
     if (this.entryid) {
+      console.log("***"+this.entryid);
       var url = this.baseUrl + "api/diary/" + this.entryid;
       this.http.get<DiaryEntryCalendar>(url).subscribe(result => {
         this.diaryEntry = result;
-        console.log(result);
-        this.formTitle = "Edit diary entry for " + this.diaryEntry.date;
-        //this.selectedDate.setValue(new Date(this.diaryEntry.date));
         this.display_date = this.diaryEntry.date;
+        this.display_day_date = this.diaryEntry.date + "  --  " + this.getDayOfWeek(new Date(this.diaryEntry.date));
         this.form.patchValue(this.diaryEntry);
         this.user_message = "Loaded successfully...";
       }, error => console.error(error));
@@ -175,6 +197,39 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
 
 
+  }
+
+  redirectTo(uri: string) {
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() =>
+      this.router.navigate([uri]));
+  }
+
+
+  colorCell(entry_color: string) {
+
+    if (parseInt(entry_color) >= 150) return "blue";
+    if (parseInt(entry_color) >= 139) return "green";
+    if (parseInt(entry_color) >= 129) return "yellow";
+    if (parseInt(entry_color) >= 119) return "orange";
+    else return "red";
+
+
+  }
+
+  moveDay(direction: string) {
+    //console.log("sent to func"+this.display_date);
+    var newDate = this.addDays((direction == 'next' ? 2 : 0), this.display_date);
+    //console.log("after func"+newDate);
+    this.diaryService.addNewEntry(newDate.toString()).subscribe(result => {
+      console.log(result);
+      //this.router.navigate(['/diaryentry', result]);
+
+      const currentUrl = this.router.url;
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/diaryentry', result]);
+      });
+
+    }, error => console.error(error));
   }
 
 

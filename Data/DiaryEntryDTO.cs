@@ -9,6 +9,8 @@
         public string entry_color { get; set; }
         public string entry_date { get; set; }
         public int entry_date_int { get; set; }
-        
+
+        public int total_points { get; set; }
+
     }
 }

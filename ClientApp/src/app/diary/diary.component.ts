@@ -71,55 +71,39 @@ export class DiaryComponent {
   }
 
   colorCell(entry_color: string) {
-    var cellColor : string = "";
-    switch (entry_color) {
-      case "1":
-        cellColor = "red"
-        break;
-      case "2":
-        cellColor = "orange"
-        break;
-      case "3":
-        cellColor = "yellow"
-        break;
-      case "4":
-        cellColor = "green"
-        break;
-      case "5":
-        cellColor = "blue"
-        break;
-      default:
-        cellColor="red"
-    }
     
-    return cellColor;
+    if (parseInt(entry_color) >= 150) return "blue";
+    if (parseInt(entry_color) >= 139) return "green";
+    if (parseInt(entry_color) >= 129) return "yellow";
+    if (parseInt(entry_color) >= 119) return "orange";
+    else return "red";
+
+
   }
 
   onSelectFrom(event) {
-    //console.log(event);
+    
     this.selectedDateFrom = event;
     const dateString = event.toDateString();
-    //console.log(new Date().toLocaleDateString("en-US").toString());
-    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    
     const dateValue = dateString.split(' ');
     this.yearFrom = dateValue[3];
     this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
     
-    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    
     this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }
 
   onSelectTo(event) {
-    //console.log(event);
+    
     this.selectedDateTo = event;
     const dateString = event.toDateString();
-    //console.log(new Date().toLocaleDateString("en-US").toString());
-    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
+    
     const dateValue = dateString.split(' ');
     this.yearTo = dateValue[3];
     this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
 
-    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
+    
     this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }
 
@@ -191,14 +175,7 @@ export class DiaryComponent {
     var filterQuery = (this.filterQuery) ? this.filterQuery : null;
 
 
-    /*this.http.get < ApiResult<DiaryEntry>>(url, { params })
-      .subscribe(result => {
-        this.paginator.length = result.totalCount;
-        this.paginator.pageIndex = result.pageIndex;
-        this.paginator.pageSize = result.pageSize;
-        this.entries = new MatTableDataSource<DiaryEntry>(result.data);
-      }, error => console.error(error));
-    */
+    
     this.getEntries2(this.selectedDateFrom.toString(), this.selectedDateTo.toString(), event.pageIndex.toString(), event.pageSize.toString())
   }
 

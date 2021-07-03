@@ -82,8 +82,8 @@ export class DiaryService extends BaseService {
     return this.http.post<boolean>(url, null);
   }
 
-  updateComment(comment: string, entry_id: number): Observable<boolean> {
-    var url = this.baseUrl + "api/diary/updatecomment?comment=" + comment + "&entry_id=" + entry_id;
+  updateComment(comment: string, weight: number, entry_id: number): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/updatecomment?comment=" + comment + "&weight=" + weight + "&entry_id=" + entry_id;
     return this.http.post<boolean>(url, null);
 
   }

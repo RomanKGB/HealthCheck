@@ -43,8 +43,8 @@
   <ng-container matColumnDef="entry_date">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
     <td mat-cell *matCellDef="let diaryentry">
-      {{diaryentry.entry_date}}&nbsp;&nbsp;&nbsp;({{getDayOfWeek(diaryentry.entry_date)}})
-    </td>
+      <a [routerLink]="['/diaryentry',diaryentry.entry_id]">{{diaryentry.entry_date}}&nbsp;&nbsp;&nbsp;({{getDayOfWeek(diaryentry.entry_date)}})</a>
+</td>
   </ng-container>
   <ng-container matColumnDef="entry_text">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Text</th>
@@ -52,8 +52,8 @@
   </ng-container>
   <ng-container matColumnDef="entry_color">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Color</th>
-    <td mat-cell *matCellDef="let diaryentry" [ngStyle]="{'background-color': colorCell(diaryentry.entry_color)}">
-     &nbsp;
+    <td align="center" mat-cell *matCellDef="let diaryentry" [ngStyle]="{'background-color': colorCell(diaryentry.total_points)}" style="color:white">
+      {{diaryentry.total_points}}
     </td>
   </ng-container>
 
