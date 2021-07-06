@@ -11,29 +11,28 @@
       </mat-calendar>
     </div>
     <div class='demo-app-sidebar-section'>
-      Create New Entry for:{{newFormattedDate}}
-      <mat-calendar [selected]="newDateFrom"
-                    [minDate]="minDate"
-                    [maxDate]="maxDate"
-                    [dateFilter]="myDateFilter"
-                    (selectedChange)="onSelectNewDate($event)">
-      </mat-calendar>
-      <button mat-raised-button color="primary" (click)="createNew()">New Entry</button>
-    </div>
-    <div class='demo-app-sidebar-section'>
-      
-    </div>
-    <div class='demo-app-sidebar-section'>
-      <h2></h2>
-      <ul>
-        <li *ngFor='let event of events'>
-          <b>{{event.startStr}}</b>
-          <i>{{event.title}}</i>
-        </li>
-      </ul>
+      <table mat-table [dataSource]="top10" class="mat-elevation-z8" [hidden]="!top10" matSort (matSortChange)="loadData()" width="100%">
+
+        <ng-container matColumnDef="diary_month">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Month</th>
+          <td mat-cell *matCellDef="let top10item">{{top10item.diary_month}}</td>
+        </ng-container>
+        <ng-container matColumnDef="diary_year">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Year</th>
+          <td mat-cell *matCellDef="let top10item">{{top10item.diary_year}}</td>
+        </ng-container>
+        <ng-container matColumnDef="avg_points_completed">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>AVG</th>
+          <td mat-cell *matCellDef="let top10item">
+            {{top10item.avg_points_completed}}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns:displayedColumns;"></tr>
+      </table>
     </div>
   </div>
-
   <div class='demo-app-main'>
     <full-calendar #calendar [options]='calendarOptions'></full-calendar>
   </div>

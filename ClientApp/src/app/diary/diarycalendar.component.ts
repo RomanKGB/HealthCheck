@@ -2,7 +2,7 @@ import { Component, Inject, ViewChild, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, Calendar, FullCalendarComponent } from '@fullcalendar/angular';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
-import { DiaryEntry } from './diary';
+import { DiaryEntry, Top10Months } from './diary';
 import { ApiResult } from '../base.service';
 import { DiaryEntryCalendar } from './diarycalendar';
 import { MatDialog } from '@angular/material/dialog';
@@ -28,7 +28,8 @@ import { DiaryService } from './diaryservice';
 
 export class DiaryCalendar {
   protected http: HttpClient;
-  protected baseUrl: string;private 
+  protected baseUrl: string; private
+  public displayedColumns: string[] = ['diary_month', 'diary_year','avg_points_completed'];
   protected posts = [];
   protected selectedDateFrom = new Date("2021/01/01");
   protected newDateFrom = new Date();
@@ -60,6 +61,7 @@ export class DiaryCalendar {
   @ViewChild('calendar') calendarObj: FullCalendarComponent;
 
   currentEvents: EventApi[] = [];
+  top10: Top10Months[] = [];
 
   
 
@@ -109,41 +111,14 @@ export class DiaryCalendar {
 
 
   handleDateSelect(selectInfo: DateSelectArg) {
-    console.log(selectInfo);
+    //console.log(selectInfo);
     var selected_date = selectInfo.startStr;//.toLocaleDateString("en-US").toString();
-    console.log(selected_date);
+    //console.log(selected_date);
     this.newFormattedDate = selected_date;
     this.createNew();
 
 
-    //this.selectedDateTo = event;
-    //const dateString = selectInfo.startStr.toDateString();
-    //console.log(new Date().toLocaleDateString("en-US").toString());
-    //console.log(new Date(dateString).toLocaleDateString("en-US").toString());
-    //const dateValue = dateString.split(' ');
-    //this.yearTo = dateValue[3];
-    //this.DayAndDateTo = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
-
-    //this.getEntries(new Date(dateString).toLocaleDateString("en-US").toString());
-    //new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString();
-
-    /*const title = prompt('Please enter a new title for your event');
-    const calendarApi = selectInfo.view.calendar;
-    var selected_date=new Date(selectInfo.startStr).toLocaleDateString("en-US").toString();
-    //need to create a new component to edit entries
-    //this.dlg.open(new DiaryEntryComponent(this.http, this.baseUrl);
-
-    calendarApi.unselect(); // clear date selection
-
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId().toString(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay
-      });
-    }*/
+  
   }
 
   handleEventClick(clickInfo: EventClickArg) {
@@ -165,7 +140,11 @@ export class DiaryCalendar {
   }
 
   ngOnInit() {
-    this.loadEvents("1/1/2000","12/1/2021")
+    this.loadEvents("1/1/2000", "12/1/2021");
+    this.diaryService.getTop10Months<ApiResult<Top10Months>>().subscribe(result => {
+      //console.log(result);
+      this.top10 = result.data;
+    });
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {

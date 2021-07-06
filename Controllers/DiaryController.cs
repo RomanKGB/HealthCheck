@@ -172,6 +172,32 @@ namespace HealthCheck.Controllers
         }
 
         [HttpGet]
+        [Route("gettoptenmonths")]
+        public async Task<ActionResult<ApiResult<Top10Months>>> GetTop10Months()
+        {
+
+            return await Task.Run(() =>
+            {
+                //string strSQL = "select activity_id,activity_name,activity_points from activity where activity_id not in (select activity_id from diary_activities where entry_id="+entry_id+") order by activity_name";
+
+                string strSQL = "dbo.getTop10Months";
+
+
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<Top10Months> activityList = new List<Top10Months>();
+                activityList = (from DataRow dr in dbTable.Rows
+                                select new Top10Months()
+                                {
+                                    diary_month= dr["diary_month"].ToString(),
+                                    diary_year= dr["diary_year"].ToString(),
+                                    avg_points_completed=int.Parse(dr["avg_points_completed"].ToString())
+                                }).ToList();
+
+                return new ApiResult<Top10Months>(activityList, activityList.Count, 1, 100, null, null, null, null);
+            });
+        }
+
+        [HttpGet]
         [Route("getentryactivities")]
         public async Task<ActionResult<ApiResult<Activity>>> GetEntryActivities(int entry_id)
         {
