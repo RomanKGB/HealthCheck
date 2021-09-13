@@ -48,8 +48,8 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": false//,
+              //"ngswConfigPath": "ngsw-config.json"
             }
           }
         },

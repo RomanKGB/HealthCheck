@@ -11,6 +11,7 @@
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
     <RootNamespace>HealthCheck</RootNamespace>
+    <UserSecretsId>c33dd0a5-1db8-4e74-897f-8908acb60450</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

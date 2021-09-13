@@ -24,7 +24,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   //public displayedColumns: string[] = ['select', 'id', 'description', 'points'];
   public displayedColumns: string[] = ['select', 'description', 'points','done'];
   public user_message: string="";
-  protected entryid: string;
+  public entryid: string;
   public completed: number = 0;
   public planned: number = 0;
   form: FormGroup;
@@ -35,12 +35,14 @@ export class DiaryEntryComponent extends BaseFormComponent{
   display_date: string = "";
   display_day_date: string = "";
   activitiesList: any;
-  activitiesList2:any;
+  activitiesList2: any;
+  activitiesListMaster: any;
   activities_list: MatList;
   selected_activites: MatListOption[];
   selection_string:string = "";
   selection = new SelectionModel<Activity>(true, []);
   @ViewChild('todays_tasks') firstListObj: MatList;
+  searchVal: string = "";
 
   constructor(protected http: HttpClient, @Inject('BASE_URL') protected baseUrl: string,
     private activatedRoute: ActivatedRoute, private router: Router,
@@ -81,6 +83,18 @@ export class DiaryEntryComponent extends BaseFormComponent{
     catch { return 0;}
   }
 
+  onSearchChange(searchValue: string) {
+    //console.log(searchValue);
+    this.activitiesList=this.filterList(this.activitiesListMaster, searchValue);
+  }
+
+  filterList(listOfNames: Activity[], nameToFilter: string): Activity[] {
+    if (!listOfNames) return null;
+    if (!nameToFilter) return listOfNames;
+
+    return listOfNames.filter(n => n.activity_name.toUpperCase().indexOf(nameToFilter.toUpperCase()) >= 0);
+  }
+
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     if (this.isAllSelected()) {
@@ -101,8 +115,8 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   loadActivities() {
     this.diaryService.getActivities<ApiResult<Activity>>(this.entryid).subscribe(result => {
-      //console.log(result.data);
-      this.activitiesList = result.data;
+      this.activitiesListMaster = result.data;
+      this.activitiesList = this.activitiesListMaster;
     });
   }
 
@@ -181,7 +195,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     }
     catch { }
     if (this.entryid) {
-      console.log("***"+this.entryid);
+      //console.log("***"+this.entryid);
       var url = this.baseUrl + "api/diary/" + this.entryid;
       this.http.get<DiaryEntryCalendar>(url).subscribe(result => {
         this.diaryEntry = result;
@@ -205,12 +219,12 @@ export class DiaryEntryComponent extends BaseFormComponent{
   }
 
 
-  colorCell(entry_color: string) {
+  colorCell(entry_color: number) {
 
-    if (parseInt(entry_color) >= 150) return "blue";
-    if (parseInt(entry_color) >= 139) return "green";
-    if (parseInt(entry_color) >= 129) return "yellow";
-    if (parseInt(entry_color) >= 119) return "orange";
+    if (entry_color >= 150) return "blue";
+    if (entry_color >= 139) return "green";
+    if (entry_color >= 129) return "yellow";
+    if (entry_color >= 119) return "orange";
     else return "red";
 
 
@@ -247,7 +261,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     var activitiesToAdd = "";
     this.selected_activites.map(o => { activitiesToAdd+=o.value+"," });
     //this.diaryService.addActivityToEntry(parseInt(this.entryid), 4);
-    //console.log(parseInt(this.entryid));
+    this.searchVal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();

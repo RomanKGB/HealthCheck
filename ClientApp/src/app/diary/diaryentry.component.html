@@ -20,12 +20,12 @@
       </td>
     </tr>
     <tr>
-      <td align="left" valign="top">
+      <td align="left" valign="top"  style="width: 800px;">
         <div class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
           <div class="form-group">
             <label for="title">Comment for {{display_day_date}}:</label>
             <br />
-            <textarea id="title" formControlName="title" cols="100" rows="5" required placeholder="City name..." class="form-control"></textarea>
+            <textarea id="title" formControlName="title" cols="100" rows="10" required placeholder="City name..." class="form-control"></textarea>
             <div *ngIf="hasError('title')" class="invalid-feedback">
               <div *ngIf="form.get('title').errors?.required">
                 Title is required
@@ -98,7 +98,7 @@
           </div>
         </div>
       </td>
-      <td align="left" valign="top">
+      <td align="left" valign="top" style="width: 300px;">
         <div class="form" [formGroup]="formNewActivity" (ngSubmit)="onSubmit()">
           <div class="form-group">
             <input type="text" id="new_activity_name" formControlName="new_activity_name" required placeholder="Activity name..." class="form-control" />
@@ -124,6 +124,8 @@
           <button mat-raised-button color="primary" [disabled]="formNewActivity.invalid" (click)="onAddNewActivity($event)">Add New Activity</button>
           <br /><br />
           <button mat-raised-button color="primary" (click)="onAddToTodayClick($event)">Add to today</button>
+          <br /><br />
+                <input type="text" (input)="onSearchChange($event.target.value)" class="form-control" [(ngModel)]="searchVal"/>
           <mat-selection-list #activities_list formControlName="activities_list" (selectionChange)="onActivitiesSelectChange($event)">
             <mat-list-option *ngFor="let activity of activitiesList" [value]="activity.activity_id">
               {{activity.activity_name}}-({{activity.activity_points}})

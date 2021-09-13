@@ -70,12 +70,12 @@ export class DiaryComponent {
     this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }
 
-  colorCell(entry_color: string) {
+  colorCell(entry_color: number) {
     
-    if (parseInt(entry_color) >= 150) return "blue";
-    if (parseInt(entry_color) >= 139) return "green";
-    if (parseInt(entry_color) >= 129) return "yellow";
-    if (parseInt(entry_color) >= 119) return "orange";
+    if (entry_color >= 150) return "blue";
+    if (entry_color >= 139) return "green";
+    if (entry_color >= 129) return "yellow";
+    if (entry_color >= 119) return "orange";
     else return "red";
 
 

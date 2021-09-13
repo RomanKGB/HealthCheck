@@ -27,19 +27,19 @@ import { DiaryService } from './diaryservice';
   
 
 export class DiaryCalendar {
-  protected http: HttpClient;
-  protected baseUrl: string; private
+  public http: HttpClient;
+  public baseUrl: string; private
   public displayedColumns: string[] = ['diary_month', 'diary_year','avg_points_completed'];
-  protected posts = [];
-  protected selectedDateFrom = new Date("2021/01/01");
-  protected newDateFrom = new Date();
+  public posts = [];
+  public selectedDateFrom = new Date("2013/01/01");
+  public newDateFrom = new Date();
   public newFormattedDate: string = new Date().toLocaleDateString("en-US").toString();
-  protected selectedDateTo = new Date();
-  protected startAt = new Date("2000/01/01");
-  protected minDate = new Date('2012/01/01');
-  protected maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
-  protected currentMonth: string = new Date().getMonth().toString();
-  protected DayAndDateFrom: string;
+  public selectedDateTo = new Date();
+  public startAt = new Date("2000/01/01");
+  public minDate = new Date('2012/01/01');
+  public maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
+  public currentMonth: string = new Date().getMonth().toString();
+  public DayAndDateFrom: string;
  
   protected dlg: MatDialog;
   date = new FormControl(new Date());

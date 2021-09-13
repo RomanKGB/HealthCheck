@@ -205,7 +205,7 @@ namespace HealthCheck.Controllers
             return await Task.Run(() =>
             {
                 string strSQL = "select a.activity_id  as activity_id,a.activity_name,a.activity_points,da.done from "
-                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id = "+entry_id +" order by activity_name";
+                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id="+entry_id +" order by da.done asc";
 
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
@@ -218,8 +218,7 @@ namespace HealthCheck.Controllers
                                     activity_points = Int32.Parse(dr["activity_points"].ToString()),
                                     done = Int32.Parse(dr["done"].ToString())
                                 }).ToList();
-
-                return new ApiResult<Activity>(activityList, activityList.Count, 0, 0, "", "", "", "");
+                    return new ApiResult<Activity>(activityList, activityList.Count, 0, 0, "", "", "", "");
             });
         }
 

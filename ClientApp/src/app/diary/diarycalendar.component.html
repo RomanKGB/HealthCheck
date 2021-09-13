@@ -2,8 +2,8 @@
 
   <div class='demo-app-sidebar'>
     <div class='demo-app-sidebar-section'>
-      <mat-calendar [selected]="selectedDateFrom"
-                    [startAt]="startAt"
+      <mat-calendar [selected]="newDateFrom"
+                    [startAt]="newDateFrom"
                     [minDate]="minDate"
                     [maxDate]="maxDate"
                     [dateFilter]="myDateFilter"
@@ -11,7 +11,7 @@
       </mat-calendar>
     </div>
     <div class='demo-app-sidebar-section'>
-      <table mat-table [dataSource]="top10" class="mat-elevation-z8" [hidden]="!top10" matSort (matSortChange)="loadData()" width="100%">
+      <table mat-table [dataSource]="top10" class="mat-elevation-z8" [hidden]="!top10" matSort width="100%">
 
         <ng-container matColumnDef="diary_month">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Month</th>

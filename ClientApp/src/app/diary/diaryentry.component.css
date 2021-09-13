@@ -58,3 +58,7 @@ section {
 .blue {
   background-color: blue;
 }
+
+.mat-select /deep/ .mat-select-trigger {
+  min-width: 100px;
+}
