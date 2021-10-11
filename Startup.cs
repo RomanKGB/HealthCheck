@@ -157,6 +157,7 @@ namespace HealthCheck
 
                 if (env.IsDevelopment())
                 {
+                    spa.Options.StartupTimeout = new System.TimeSpan(0, 0, 100);
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
