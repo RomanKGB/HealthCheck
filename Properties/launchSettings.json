@@ -2,9 +2,13 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/HealthCheck",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:22575/",
-      "sslPort": 44347
+      "sslPort": 0
     }
   },
   "profiles": {
