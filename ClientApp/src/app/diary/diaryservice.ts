@@ -60,6 +60,12 @@ export class DiaryService extends BaseService {
      
   }
 
+  setHighlightDay(entry_id: number, highlight: string): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/sethighlight?entry_id=" + entry_id + "&highlight=" + highlight;
+    return this.http.post<boolean>(url, null);
+
+  }
+
   deleteActivitiesFromEntry(entry_id: number, activity_id: string): Observable<boolean> {
     var url = this.baseUrl + "api/diary/deleteactivity?entry_id=" + entry_id + "&activity_id=" + activity_id;
     return this.http.post<boolean>(url, null);

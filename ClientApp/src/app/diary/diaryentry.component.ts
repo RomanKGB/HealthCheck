@@ -27,6 +27,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   public entryid: string;
   public completed: number = 0;
   public planned: number = 0;
+  public is_highlight: boolean = false;
   form: FormGroup;
   formNewActivity: FormGroup;
   formTitle: string;
@@ -55,12 +56,12 @@ export class DiaryEntryComponent extends BaseFormComponent{
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl('', Validators.required),
-      weight: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
+      weight: new FormControl('', [Validators.required, Validators.pattern("-?\\d+(?:\\.\\d+)?")]),
       date: new FormControl('')
     }, null, null);
     this.formNewActivity = new FormGroup({
       new_activity_name: new FormControl('', Validators.required),
-      new_activity_points: new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9]{0,4})?$")]),
+      new_activity_points: new FormControl('', [Validators.required, Validators.pattern("-?\\d+(?:\\.\\d+)?")]),
       activities_list: new FormControl('')
     }, null, null);
     
@@ -128,7 +129,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
       this.planned = 0;
       result.data.map(a => {
         if (a.done == 1) this.completed += a.activity_points;
-        this.planned += a.activity_points;
+        this.planned += (a.activity_points < 0 ? 0 : a.activity_points);
       });
       //this.activitiesList2
     });
@@ -184,14 +185,23 @@ export class DiaryEntryComponent extends BaseFormComponent{
       'Saturday'
     ];
 
-    var d = new Date(paramD);
+    var d = new Date(paramD.toString());
     return gsDayNames[(d.getDay() == 6 ? 0 : d.getDay()+1)];
+  }
+
+
+  setHighlight(eventObj) {
+    this.is_highlight = eventObj.checked;
+    this.diaryService.setHighlightDay(parseInt(this.entryid), (this.is_highlight?"Y":"N")).subscribe(result => {
+      this.user_message = "Highlight status updated...";
+    }, error => console.error(error));
   }
 
   loadData() {
 
     try {
       this.entryid = this.activatedRoute.snapshot.paramMap.get('entryid').toString();
+      console.log("Get it here:" + this.activatedRoute.snapshot.paramMap.get('entryid').toString());
     }
     catch { }
     if (this.entryid) {
@@ -202,6 +212,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
         this.display_date = this.diaryEntry.date;
         this.display_day_date = this.diaryEntry.date + "  --  " + this.getDayOfWeek(new Date(this.diaryEntry.date));
         this.form.patchValue(this.diaryEntry);
+        this.is_highlight = (this.diaryEntry.highlight=="Y");
         this.user_message = "Loaded successfully...";
       }, error => console.error(error));
     }
@@ -230,10 +241,34 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   }
 
+  colorCellFront(entry_color: number) {
+
+    if (entry_color >= 129 && entry_color < 139) return "blue";
+    else return "white";
+
+
+  }
+
+  thisMonth() {
+    var pMonth = new Date(this.display_date).getMonth() + 1;
+    var pYear = new Date(this.display_date).getFullYear();
+
+    
+
+      //const currentUrl = this.router.url;
+    //this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/calendar', pMonth,pYear]);
+      //});
+
+    //}, error => console.error(error));
+  }
+
   moveDay(direction: string) {
     //console.log("sent to func"+this.display_date);
     var newDate = this.addDays((direction == 'next' ? 2 : 0), this.display_date);
-    //console.log("after func"+newDate);
+
+    this.updateComment();
+
     this.diaryService.addNewEntry(newDate.toString()).subscribe(result => {
       console.log(result);
       //this.router.navigate(['/diaryentry', result]);
@@ -264,7 +299,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     this.searchVal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
       this.loadEntryActivities();
-      this.loadActivities();
+      //this.loadActivities();
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
   }

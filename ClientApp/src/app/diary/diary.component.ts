@@ -85,11 +85,11 @@ export class DiaryComponent {
     
     this.selectedDateFrom = event;
     const dateString = event.toDateString();
-    
+    console.log(dateString);
     const dateValue = dateString.split(' ');
     this.yearFrom = dateValue[3];
     this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
-    
+    console.log(this.DayAndDateFrom);
     
     this.getEntries2(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), new Date(this.selectedDateTo).toLocaleDateString("en-US").toString());
   }

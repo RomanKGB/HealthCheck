@@ -29,7 +29,8 @@ import { DiaryService } from './diaryservice';
 export class DiaryCalendar {
   public http: HttpClient;
   public baseUrl: string; private
-  public displayedColumns: string[] = ['diary_month', 'diary_year','avg_points_completed'];
+  public displayedColumns: string[] = ['diary_month', 'diary_year', 'avg_points_completed'];
+  public displayedColumns2: string[] = ['date','title'];
   public posts = [];
   public selectedDateFrom = new Date("2013/01/01");
   public newDateFrom = new Date();
@@ -39,22 +40,21 @@ export class DiaryCalendar {
   public minDate = new Date('2012/01/01');
   public maxDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
   public currentMonth: string = new Date().getMonth().toString();
+  public currentYear: string = new Date().getFullYear().toString();
   public DayAndDateFrom: string;
+  public highlightsMonth: string = (new Date().getMonth() + 1).toString();
+  public highlightsYear: string = new Date().getFullYear().toString();
  
   protected dlg: MatDialog;
   date = new FormControl(new Date());
 
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private router: Router, private diaryService: DiaryService) {
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private router: Router, private diaryService: DiaryService,
+    private activatedRoute: ActivatedRoute) {
     this.baseUrl = baseUrl;
     this.http = http;
     
   }
-  /*constructor(
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private cityService: CityService
-  ) { super(); }
-  */
+  
   calendarVisible = true;
   calendarOptions: CalendarOptions;
 
@@ -62,8 +62,18 @@ export class DiaryCalendar {
 
   currentEvents: EventApi[] = [];
   top10: Top10Months[] = [];
+  month_highlights: DiaryEntryCalendar[] = [];
 
-  
+  getRecord(rowObj) {
+    this.calendarObj.getApi().gotoDate(new Date(rowObj.diary_month + "/1/" + rowObj.diary_year));
+    this.highlightsMonth = rowObj.diary_month;
+    this.highlightsYear = rowObj.diary_year;
+    this.loadHighlights();
+  }
+
+  getRecordEntry(rowObj) {
+    this.router.navigate(['/diaryentry', rowObj.id]);
+  }
 
   onSelectDate(event) {
     this.selectedDateFrom = event;
@@ -72,17 +82,24 @@ export class DiaryCalendar {
 
     const dateValue = dateString.split(' ');
     
-    this.DayAndDateFrom = dateValue[0] + ',' + ' ' + dateValue[1] + ' ' + dateValue[2];
-    this.loadEvents(new Date(this.selectedDateFrom).toLocaleDateString("en-US").toString(), "4/1/2021")
+    this.DayAndDateFrom = dateValue[1] + ',' + ' ' + dateValue[2] + ' ' + dateValue[3];
+    this.newDateFrom = this.selectedDateFrom;
+    //this.loadEvents(new Date(this.DayAndDateFrom).toLocaleDateString("en-US").toString(), this.maxDate.toLocaleDateString("en-US").toString());
     this.calendarObj.getApi().gotoDate(this.selectedDateFrom);
+    this.currentMonth = (this.selectedDateFrom.getMonth()+1).toString();
+    this.currentYear = this.selectedDateFrom.getFullYear().toString();
+
+    this.loadHighlights();
   }
 
 
 
   myDateFilter = (d: Date): boolean => {
     const day = d.getDay();
+    
+    return true;
     // Prevent Saturday and Sunday from being selected.
-    return true;//day !== 0 && day !== 6;
+    //day !== 0 && day !== 6;
   }
 
 
@@ -97,7 +114,7 @@ export class DiaryCalendar {
       'Saturday'
     ];
 
-    var d = new Date(paramD);
+    var d = new Date(paramD.toString());
     return gsDayNames[d.getDay()];
   }
 
@@ -105,8 +122,8 @@ export class DiaryCalendar {
     //console.log(event);
     this.newDateFrom = event;
     const dateString = event.toDateString();
-    this.newFormattedDate = new Date(this.newDateFrom).toLocaleDateString("en-US").toString();
-    
+    //this.newFormattedDate = new Date(this.newDateFrom).toLocaleDateString("en-US").toString();
+    this.newFormattedDate = this.newDateFrom.toLocaleDateString("en-US").toString();
   }
 
 
@@ -140,11 +157,57 @@ export class DiaryCalendar {
   }
 
   ngOnInit() {
-    this.loadEvents("1/1/2000", "12/1/2021");
+    try {
+      this.currentMonth = this.activatedRoute.snapshot.paramMap.get('cal_month').toString();
+      this.currentYear = this.activatedRoute.snapshot.paramMap.get('cal_year').toString();
+    }
+    catch(e) {
+      this.currentMonth = (new Date().getMonth()+1).toString();
+      this.currentYear = new Date().getFullYear().toString();
+    }
+    console.log("Month:" + this.currentMonth + "Year:" + this.currentYear);
+    this.loadEvents("1/1/2000", "12/1/2022");
     this.diaryService.getTop10Months<ApiResult<Top10Months>>().subscribe(result => {
-      //console.log(result);
       this.top10 = result.data;
     });
+    this.loadHighlights();
+    
+  }
+
+  loadHighlights() {
+    var url = this.baseUrl + 'api/diary/getmonthhighlights';
+    var params = new HttpParams()
+      //.set("month", this.highlightsMonth)
+      //.set("year", this.highlightsYear);
+      .set("month", this.currentMonth)
+      .set("year", this.currentYear);
+
+    console.log("Load current month:" + this.currentMonth);
+    this.http.get<ApiResult<DiaryEntryCalendar>>(url, { params })
+      .subscribe(result => {
+        this.month_highlights = result.data;
+        console.log(result.data);
+      }, error => console.error(error));
+
+
+  }
+
+  nextMonth(): void {
+    this.currentYear = (parseInt(this.currentMonth) == 12 ? (parseInt(this.currentYear) + 1).toString(): this.currentYear);
+    this.currentMonth = (parseInt(this.currentMonth) == 12 ? 1 : parseInt(this.currentMonth) + 1).toString();
+    console.log("Next current month:" + this.currentMonth);
+    console.log("Next current year:" + this.currentYear);
+    this.calendarObj.getApi().next();
+    this.loadHighlights();
+  }
+
+  prevMonth(): void {
+    this.currentYear = (parseInt(this.currentMonth) == 12 ? (parseInt(this.currentYear) - 1).toString() : this.currentYear);
+    this.currentMonth = (parseInt(this.currentMonth) == 1 ? 12 : parseInt(this.currentMonth) - 1).toString();
+    console.log("Prev current month:" + this.currentMonth);
+    console.log("Prev current year:" + this.currentYear);
+    this.calendarObj.getApi().prev();
+    this.loadHighlights();
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
@@ -162,6 +225,18 @@ export class DiaryCalendar {
             left: 'prev,next today',
             center: 'title'
           },
+          customButtons: {
+            next: {
+              click: this.nextMonth.bind(this),
+            },
+            prev: {
+              click: this.prevMonth.bind(this),
+            },
+            today: {
+              text: "Today",
+              //click: this.currentMonth.bind(this),
+            },
+          },
           initialView: 'dayGridMonth',
           weekends: true,
           editable: true,
@@ -173,7 +248,8 @@ export class DiaryCalendar {
           eventsSet: this.handleEvents.bind(this),
           events: result.data
         };
-        console.log(result.data);
+        this.calendarObj.getApi().gotoDate(new Date(this.currentMonth + "/1/" + this.currentYear));
+        this.newDateFrom = new Date(this.currentMonth + "/1/" + this.currentYear);
       }, error => console.error(error));
 
     

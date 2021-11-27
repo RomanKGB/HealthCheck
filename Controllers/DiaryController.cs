@@ -87,7 +87,7 @@ namespace HealthCheck.Controllers
                              {
                                  entry_id = int.Parse(dr["entry_id"].ToString()),
                                  entry_date = dr["entry_date"].ToString(),
-                                 entry_color = getColor(dr["days_points"].ToString()),
+                                 entry_color = getColor(dr["days_points"].ToString(),"event"),
                                  entry_text = dr["entry_text"].ToString(),
                                  total_points= int.Parse(dr["days_points"].ToString())
                              }).ToList();
@@ -120,7 +120,7 @@ namespace HealthCheck.Controllers
                 //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
 
                 string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(case da.done when 1 then a.activity_points else 0 end),0) as days_points,"
-                + "isnull(SUM(a.activity_points), 0) as days_planned_points,isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id),0) as num_activities,dbo.fnFormatDate (d.entry_date, 'YYYY-MM-DD') as entry_date,d.entry_date_int "
+                + "isnull(sum(case when a.activity_points>0 then a.activity_points else 0 end), 0) as days_planned_points,isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id),0) as num_activities,dbo.fnFormatDate (d.entry_date, 'YYYY-MM-DD') as entry_date,d.entry_date_int "
                 + "from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
                 + "left outer join activity a on a.activity_id = da.activity_id where convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "') "
                 + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int";
@@ -132,11 +132,48 @@ namespace HealthCheck.Controllers
                              {
                                  title = dr["days_points"].ToString()+"/"+ dr["days_planned_points"].ToString()+"  -  "+dr["done_activities"].ToString() + "/" + dr["num_activities"].ToString(),
                                  date = dr["entry_date"].ToString(),
-                                 backgroundColor = getColor(dr["days_points"].ToString()),
+                                 backgroundColor = getColor(dr["days_points"].ToString(),"event"),
+                                 textColor= getColor(dr["days_points"].ToString(), "text"),
                                  id= dr["entry_id"].ToString()
                              }).ToList();
 
                  return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery); 
+            });
+        }
+
+
+        [HttpGet]
+        [Route("getmonthhighlights")]
+        public async Task<ActionResult<ApiResult<DiaryEntryCalendar>>> GetHighlights(
+                string month = null,
+                string year = null
+        )
+        {
+
+            return await Task.Run(() =>
+            {
+                //string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int from vDiary where "
+                //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
+
+                string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(case da.done when 1 then a.activity_points else 0 end),0) as days_points,isnull(SUM(a.activity_points), 0) as days_planned_points, "
+                    + "isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id), 0) as num_activities,dbo.fnFormatDate(d.entry_date, 'YYYY-MM-DD') as entry_date, "
+                    + "d.entry_date_int,d.highlight from vDiary d left outer join diary_activities da on d.entry_id = da.entry_id left outer join activity a on a.activity_id = da.activity_id "
+                    + "where month(convert(date, entry_date))= "+ month+" and year(convert(date, entry_date))= " + year + " and d.highlight = 'Y' "
+                    + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int,d.highlight order by convert(date,d.entry_date) desc";
+
+                DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
+                List<DiaryEntryCalendar> diaryList = new List<DiaryEntryCalendar>();
+                diaryList = (from DataRow dr in dbTable.Rows
+                             select new DiaryEntryCalendar()
+                             {
+                                 title = dr["entry_text"].ToString(),// + "/" + dr["days_planned_points"].ToString() + "  -  " + dr["done_activities"].ToString() + "/" + dr["num_activities"].ToString(),
+                                 date = dr["entry_date"].ToString(),
+                                 backgroundColor = getColor(dr["days_points"].ToString(),"event"),
+                                 textColor= getColor(dr["days_points"].ToString(), "text"),
+                                 id = dr["entry_id"].ToString()
+                             }).ToList();
+
+                return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, 1, 1, "", "", null, null);
             });
         }
 
@@ -205,7 +242,7 @@ namespace HealthCheck.Controllers
             return await Task.Run(() =>
             {
                 string strSQL = "select a.activity_id  as activity_id,a.activity_name,a.activity_points,da.done from "
-                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id="+entry_id +" order by da.done asc";
+                +" activity a inner join diary_activities da on da.activity_id = a.activity_id and da.entry_id="+entry_id + " order by da.done asc,a.activity_name";
 
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
@@ -238,6 +275,21 @@ namespace HealthCheck.Controllers
                     allok= dbLayer.ExecuteSQL(strSQL);
                 }
                 return allok; 
+            });
+        }
+
+        [HttpPost]
+        [Route("sethighlight")]
+        public async Task<ActionResult<bool>> SetHighlight(int entry_id, string highlight)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "";
+
+
+                strSQL = "update diary set highlight='" + highlight + "' where entry_id=" + entry_id;// + ")";
+                dbLayer.ExecuteSQL(strSQL);
+                return true;
             });
         }
 
@@ -335,7 +387,7 @@ namespace HealthCheck.Controllers
         {
             return await Task.Run(() =>
             {
-                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int,my_weight from vDiary where "
+                string strSQL = "select entry_id,entry_text,isnull(entry_color,'1') as entry_color,entry_date,entry_date_int,my_weight,highlight from vDiary where "
                     + "entry_id=" + id;
                 DiaryEntryCalendar diaryEntry = new DiaryEntryCalendar();
 
@@ -347,21 +399,29 @@ namespace HealthCheck.Controllers
                     diaryEntry.date = dbTable.Rows[0]["entry_date"].ToString();
                     diaryEntry.backgroundColor=dbTable.Rows[0]["entry_color"].ToString();
                     diaryEntry.weight = int.Parse(dbTable.Rows[0]["my_weight"].ToString());
+                    diaryEntry.highlight= dbTable.Rows[0]["highlight"].ToString();
                 }
                 catch (Exception e) { Console.Write(e.Message); }
                 return diaryEntry;
             });
         }
 
-        private string getColor(string color_value)
+        private string getColor(string color_value,string color_type)
         {
             int days_points = int.Parse(color_value);
 
-            if (days_points >= 150) return "blue";
-            if (days_points >= 139) return "green";
-            if (days_points >= 129) return "yellow";
-            if (days_points >= 119) return "orange";
-            else return "red";
+            switch(color_type)
+            { case "event": 
+                    if (days_points >= 150) return "blue";
+                    if (days_points >= 139) return "green";
+                    if (days_points >= 129) return "yellow";
+                    if (days_points >= 119) return "orange";
+                    else return "red";
+                default:
+                    if (days_points >= 129 && days_points < 139) return "blue";
+                    else return "#ffffff";
+            }
+
         }
 
     }

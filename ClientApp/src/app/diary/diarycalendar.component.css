@@ -45,3 +45,7 @@ b { /* used for event dates/times */
   max-width: 1100px;
   margin: 0 auto;
 }
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}

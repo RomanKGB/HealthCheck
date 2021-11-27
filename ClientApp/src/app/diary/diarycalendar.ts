@@ -3,5 +3,7 @@ export interface DiaryEntryCalendar {
   title: string,
   date: string,
   backgroundColor: string,
-  weight:number
+  textColor:string,
+  weight: number,
+  highlight:string
 }
