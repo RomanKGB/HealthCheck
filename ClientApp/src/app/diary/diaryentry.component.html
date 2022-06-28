@@ -1,13 +1,9 @@
 <div class="diaryentry">
-  <h1>Edit Diary Entry</h1>
-
   <p *ngIf="this.entryid && !diaryEntry"><em>Loading entry...</em></p>
-   
   <table border="0" width="100%" cellspacing="3" cellpadding="3">
     <tr>
       <td colspan="2">{{user_message}}</td>
     </tr>
-
     <tr>
       <td colspan="2" align="center">
         <button *ngIf="this.entryid" mat-raised-button color="primary" (click)="moveDay('prev')">Previous Day</button>
@@ -56,7 +52,8 @@
           <div class="form-group">
             <button mat-raised-button color="primary" (click)="markDone(1)">Done</button>
             <button mat-raised-button color="primary" (click)="markDone(0)">Not Done</button>
-            <button mat-raised-button color="primary" (click)="deleteSelected()">Remove activities</button>
+            <button mat-raised-button color="primary" (click)="deleteSelected()">Remove Activities</button>
+            <button mat-raised-button color="primary" (click)="copyActivity()">Copy Activity</button>
             <table mat-table [dataSource]="activitiesList2" class="mat-elevation-z8" [hidden]="!activitiesList2" matSort (matSortChange)="loadData()" width="100%">
               <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
@@ -126,13 +123,16 @@
               </div>
             </div>
           </div>
-          <button mat-raised-button color="primary" [disabled]="formNewActivity.invalid" (click)="onAddNewActivity($event)">Add New Activity</button>
-          <br /><br />
-          <button mat-raised-button color="primary" (click)="onAddToTodayClick($event)">Add to today</button>
-          <br /><br />
-                <input type="text" (input)="onSearchChange($event.target.value)" class="form-control" [(ngModel)]="searchVal"/>
+          <button mat-raised-button colors="primary" [disabled]="formNewActivity.invalid" (click)="onAddNewActivity($event)">Add New Activity</button>
+          <!--button mat-raised-button color="primary" (click)="onAddToTodayClick($event)">Add to today</!--button>-->
+          <br /><br/>
+          <mat-checkbox (change)="setDone = !setDone"
+                        [checked]="setDone">
+          </mat-checkbox>&nbsp;&nbsp;<label>Mark Done</label>
+
+          <input type="text" (input)="onSearchChange($event.target.value)" class="form-control" [(ngModel)]="searchVal" />
           <mat-selection-list #activities_list formControlName="activities_list" (selectionChange)="onActivitiesSelectChange($event)">
-            <mat-list-option *ngFor="let activity of activitiesList" [value]="activity.activity_id">
+            <mat-list-option *ngFor="let activity of activitiesList" [value]="activity.activity_id" >
               {{activity.activity_name}}&nbsp;&nbsp;({{activity.activity_points}})
             </mat-list-option>
           </mat-selection-list>

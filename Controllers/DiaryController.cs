@@ -210,14 +210,14 @@ namespace HealthCheck.Controllers
 
         [HttpGet]
         [Route("gettoptenmonths")]
-        public async Task<ActionResult<ApiResult<Top10Months>>> GetTop10Months()
+        public async Task<ActionResult<ApiResult<Top10Months>>> GetTop10Months(string pMonth,string pYear)
         {
 
             return await Task.Run(() =>
             {
                 //string strSQL = "select activity_id,activity_name,activity_points from activity where activity_id not in (select activity_id from diary_activities where entry_id="+entry_id+") order by activity_name";
 
-                string strSQL = "dbo.getTop10Months";
+                string strSQL = "dbo.getTop10Months "+pMonth+","+pYear;
 
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
@@ -271,7 +271,7 @@ namespace HealthCheck.Controllers
 
                 for (int i = 0; i < arrVariables.Length-1; i++)
                 {
-                    strSQL = "insert into diary_activities (activity_id,entry_id) values (" + arrVariables[i] + "," + entry_id + ")";
+                    strSQL = "insert into diary_activities (activity_id,entry_id,done) values (" + arrVariables[i] + "," + entry_id + ",1)";
                     allok= dbLayer.ExecuteSQL(strSQL);
                 }
                 return allok; 
@@ -411,7 +411,8 @@ namespace HealthCheck.Controllers
             int days_points = int.Parse(color_value);
 
             switch(color_type)
-            { case "event": 
+            { case "event":
+                    if (days_points >= 230) return "#8A39E1";
                     if (days_points >= 150) return "blue";
                     if (days_points >= 139) return "green";
                     if (days_points >= 129) return "yellow";

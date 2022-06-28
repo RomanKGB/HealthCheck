@@ -27,6 +27,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   public entryid: string;
   public completed: number = 0;
   public planned: number = 0;
+  public setDone: boolean = true;
   public is_highlight: boolean = false;
   form: FormGroup;
   formNewActivity: FormGroup;
@@ -44,6 +45,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   selection = new SelectionModel<Activity>(true, []);
   @ViewChild('todays_tasks') firstListObj: MatList;
   searchVal: string = "";
+  public searchValLocal: string = "";
 
   constructor(protected http: HttpClient, @Inject('BASE_URL') protected baseUrl: string,
     private activatedRoute: ActivatedRoute, private router: Router,
@@ -86,7 +88,8 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   onSearchChange(searchValue: string) {
     //console.log(searchValue);
-    this.activitiesList=this.filterList(this.activitiesListMaster, searchValue);
+    this.activitiesList = this.filterList(this.activitiesListMaster, searchValue);
+    this.searchValLocal = searchValue;
   }
 
   filterList(listOfNames: Activity[], nameToFilter: string): Activity[] {
@@ -117,7 +120,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   loadActivities() {
     this.diaryService.getActivities<ApiResult<Activity>>(this.entryid).subscribe(result => {
       this.activitiesListMaster = result.data;
-      this.activitiesList = this.activitiesListMaster;
+      this.activitiesList = (this.searchValLocal == "" ? this.activitiesListMaster:this.filterList(this.activitiesListMaster, this.searchValLocal));
     });
   }
 
@@ -232,6 +235,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   colorCell(entry_color: number) {
 
+    if (entry_color >= 230) return "#8A39E1";
     if (entry_color >= 150) return "blue";
     if (entry_color >= 139) return "green";
     if (entry_color >= 129) return "yellow";
@@ -253,7 +257,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     var pMonth = new Date(this.display_date).getMonth() + 1;
     var pYear = new Date(this.display_date).getFullYear();
 
-    
+    this.updateComment();
 
       //const currentUrl = this.router.url;
     //this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
@@ -287,6 +291,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     this.diaryService.addNewActivity(this.formNewActivity.get("new_activity_name").value, parseInt(this.formNewActivity.get("new_activity_points").value)).subscribe(result => {
       this.formNewActivity.reset();
       this.loadActivities();
+      
       this.user_message = "New activity created...";
     }, error => console.error(error));
   }
@@ -294,14 +299,49 @@ export class DiaryEntryComponent extends BaseFormComponent{
   onAddToTodayClick(event: Event) {
     //console.log(this.form.get("activities_list"));
     var activitiesToAdd = "";
-    this.selected_activites.map(o => { activitiesToAdd+=o.value+"," });
-    //this.diaryService.addActivityToEntry(parseInt(this.entryid), 4);
+    this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
+    console.log("--"+this.setDone);
     this.searchVal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
       this.loadEntryActivities();
-      //this.loadActivities();
+      this.loadActivities();
+      console.log(this.searchValLocal);
+      this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
+    console.log(this.setDone);
+    if (this.setDone) {
+      this.diaryService.markDone(parseInt(this.entryid), activitiesToAdd, 1).subscribe(result => {
+        this.loadEntryActivities();
+        this.selection.clear();
+        this.user_message = "Activity status updated...";
+      }, error => console.error(error));
+    }
+  }
+
+  autoAdd() {
+    var activitiesToAdd = "";
+    this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
+
+    this.searchVal = "";
+    this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
+      this.loadEntryActivities();
+      this.loadActivities();
+      console.log(this.searchValLocal);
+      this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
+      this.user_message = "Activity added to entry...";
+    }, error => console.error(error));
+    console.log("-->"+this.setDone);
+    if (this.setDone) {
+      this.diaryService.markDone(parseInt(this.entryid), activitiesToAdd, 1).subscribe(result => {
+        this.loadEntryActivities();
+        this.selection.clear();
+        this.user_message = "Auto done set...";
+      }, error => console.error(error));
+    }
+    else {
+      console.log("Not auto done...");
+    }
   }
 
   onSelectFrom(event) {
@@ -318,7 +358,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   onActivitiesSelectChange(event: MatSelectionListChange) {
     this.selected_activites = event.source.selectedOptions.selected;
-    
+    this.autoAdd();
   }
 
 }

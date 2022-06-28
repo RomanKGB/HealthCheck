@@ -149,8 +149,8 @@ export class DiaryService extends BaseService {
     return this.http.get<ApiResult>(url, { params });
   }
 
-  getTop10Months<ApiResult>(): Observable<ApiResult> {
-    var url = this.baseUrl + 'api/diary/gettoptenmonths';
+  getTop10Months<ApiResult>(pMonth: string, pYear: string): Observable<ApiResult> {
+    var url = this.baseUrl + 'api/diary/gettoptenmonths?pMonth=' + pMonth + "&pYear=" + pYear;
     
     return this.http.get<ApiResult>(url);
   }

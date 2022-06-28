@@ -154,10 +154,10 @@ namespace HealthCheck
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
                 spa.Options.SourcePath = "ClientApp";
-
+                spa.Options.StartupTimeout = new System.TimeSpan(0, 5, 0);
                 if (env.IsDevelopment())
                 {
-                    spa.Options.StartupTimeout = new System.TimeSpan(0, 0, 100);
+                    //spa.Options.StartupTimeout = new System.TimeSpan(0, 0, 100);
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });

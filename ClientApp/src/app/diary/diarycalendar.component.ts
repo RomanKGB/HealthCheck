@@ -90,6 +90,9 @@ export class DiaryCalendar {
     this.currentYear = this.selectedDateFrom.getFullYear().toString();
 
     this.loadHighlights();
+    this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
+      this.top10 = result.data;
+    });
   }
 
 
@@ -167,7 +170,7 @@ export class DiaryCalendar {
     }
     console.log("Month:" + this.currentMonth + "Year:" + this.currentYear);
     this.loadEvents("1/1/2000", "12/1/2022");
-    this.diaryService.getTop10Months<ApiResult<Top10Months>>().subscribe(result => {
+    this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
       this.top10 = result.data;
     });
     this.loadHighlights();
@@ -199,6 +202,9 @@ export class DiaryCalendar {
     console.log("Next current year:" + this.currentYear);
     this.calendarObj.getApi().next();
     this.loadHighlights();
+    this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
+      this.top10 = result.data;
+    });
   }
 
   prevMonth(): void {
@@ -208,6 +214,9 @@ export class DiaryCalendar {
     console.log("Prev current year:" + this.currentYear);
     this.calendarObj.getApi().prev();
     this.loadHighlights();
+    this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
+      this.top10 = result.data;
+    });
   }
 
   loadEvents(selected_date_from: string = new Date().toString(), selected_date_to: string = new Date().toString()) {
@@ -249,7 +258,7 @@ export class DiaryCalendar {
           events: result.data
         };
         this.calendarObj.getApi().gotoDate(new Date(this.currentMonth + "/1/" + this.currentYear));
-        this.newDateFrom = new Date(this.currentMonth + "/1/" + this.currentYear);
+        this.newDateFrom = new Date(this.currentMonth + "/" + new Date().getDay + "/" +this.currentYear);
       }, error => console.error(error));
 
     
