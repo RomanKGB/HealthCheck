@@ -72,6 +72,12 @@ export class DiaryService extends BaseService {
 
   }
 
+  copyActivitiesToEntry(entry_id: number, activity_id: string): Observable<boolean> {
+    var url = this.baseUrl + "api/diary/copyactivities?entry_id=" + entry_id + "&activity_id=" + activity_id;
+    return this.http.post<boolean>(url, null);
+
+  }
+
   markDone(entry_id: number, activity_id: string, is_done: number): Observable<boolean> {
     var url = this.baseUrl + "api/diary/markdone?entry_id=" + entry_id + "&activity_id=" + activity_id + "&is_done=" + is_done;
     return this.http.post<boolean>(url, null);
@@ -83,9 +89,9 @@ export class DiaryService extends BaseService {
     return this.http.post<boolean>(url, null);
   }
 
-  addNewEntry(entry_date:string): Observable<boolean> {
+  addNewEntry(entry_date:string): Observable<number> {
     var url = this.baseUrl + "api/diary/addnewentry?entry_date="+entry_date;
-    return this.http.post<boolean>(url, null);
+    return this.http.post<number>(url, null);
   }
 
   updateComment(comment: string, weight: number, entry_id: number): Observable<boolean> {

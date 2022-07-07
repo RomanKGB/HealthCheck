@@ -138,6 +138,39 @@ export class DiaryEntryComponent extends BaseFormComponent{
     });
   }
 
+  copyActivity() {
+    var selected_activities_local = "";
+    var next_day_entry_id = 0;
+    this.selection.selected.map(a => selected_activities_local += a.activity_id.toString() + ",");
+    //this.diaryService.deleteActivitiesFromEntry(parseInt(this.entryid), selected_activities_local).subscribe(result => {
+    //  this.loadEntryActivities();
+    //  this.loadActivities();
+    //  this.selection.clear();
+    //  this.user_message = "Selected actitvities deleted...";
+    //}, error => console.error(error));
+    console.log(selected_activities_local);
+
+    var newDate = this.addDays(2, this.display_date);
+
+    //this.updateComment();
+
+    this.diaryService.addNewEntry(newDate.toString()).subscribe(result => {
+      next_day_entry_id = result;
+      this.diaryService.copyActivitiesToEntry(next_day_entry_id, selected_activities_local).subscribe(result => {
+        //copy activities then navigate
+        const currentUrl = this.router.url;
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigate(['/diaryentry', next_day_entry_id]);
+        });
+
+        }, error => console.error(error));
+    }, error => console.error(error));
+
+    
+  }
+
+
+
   checkboxLabel(activity?: Activity): string {
     if (!activity) {
       return `${this.isAllSelected() ? 'deselect' : 'select'} all`;

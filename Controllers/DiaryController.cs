@@ -340,6 +340,27 @@ namespace HealthCheck.Controllers
         }
 
         [HttpPost]
+        [Route("copyactivities")]
+        public async Task<ActionResult<bool>> CopyActivities(int entry_id, string activity_id)
+        {
+            return await Task.Run(() =>
+            {
+                string strSQL = "";
+                bool allok = false;
+                string[] arrVariables = activity_id.Split(",");
+
+                for (int i = 0; i < arrVariables.Length - 1; i++)
+                {
+                    strSQL = "delete from diary_activities where activity_id=" + arrVariables[i] + " and entry_id=" + entry_id;
+                    allok = dbLayer.ExecuteSQL(strSQL);
+                    strSQL = "insert into diary_activities values (" + arrVariables[i] + "," + entry_id + ",0,0)";
+                    allok = dbLayer.ExecuteSQL(strSQL);
+                }
+                return allok;
+            });
+        }
+
+        [HttpPost]
         [Route("markdone")]
         public async Task<ActionResult<bool>> MarkDone(int entry_id, string activity_id,int is_done)
         {

@@ -174,7 +174,7 @@ export class DiaryCalendar {
       this.top10 = result.data;
     });
     this.loadHighlights();
-    
+    console.log("Gavno");
   }
 
   loadHighlights() {
