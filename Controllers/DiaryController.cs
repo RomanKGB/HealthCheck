@@ -157,9 +157,9 @@ namespace HealthCheck.Controllers
 
                 string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(case da.done when 1 then a.activity_points else 0 end),0) as days_points,isnull(SUM(a.activity_points), 0) as days_planned_points, "
                     + "isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id), 0) as num_activities,dbo.fnFormatDate(d.entry_date, 'YYYY-MM-DD') as entry_date, "
-                    + "d.entry_date_int,d.highlight from vDiary d left outer join diary_activities da on d.entry_id = da.entry_id left outer join activity a on a.activity_id = da.activity_id "
+                    + "d.entry_date_int,d.highlight,d.my_weight from vDiary d left outer join diary_activities da on d.entry_id = da.entry_id left outer join activity a on a.activity_id = da.activity_id "
                     + "where month(convert(date, entry_date))= "+ month+" and year(convert(date, entry_date))= " + year + " and d.highlight = 'Y' "
-                    + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int,d.highlight order by convert(date,d.entry_date) desc";
+                    + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int,d.highlight,d.my_weight order by convert(date,d.entry_date) desc";
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
                 List<DiaryEntryCalendar> diaryList = new List<DiaryEntryCalendar>();
@@ -170,7 +170,8 @@ namespace HealthCheck.Controllers
                                  date = dr["entry_date"].ToString(),
                                  backgroundColor = getColor(dr["days_points"].ToString(),"event"),
                                  textColor= getColor(dr["days_points"].ToString(), "text"),
-                                 id = dr["entry_id"].ToString()
+                                 id = dr["entry_id"].ToString(),
+                                 weight= int.Parse(dr["my_weight"].ToString())
                              }).ToList();
 
                 return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, 1, 1, "", "", null, null);

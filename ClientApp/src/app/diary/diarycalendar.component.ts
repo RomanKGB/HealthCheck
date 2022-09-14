@@ -30,7 +30,7 @@ export class DiaryCalendar {
   public http: HttpClient;
   public baseUrl: string; private
   public displayedColumns: string[] = ['diary_month', 'diary_year', 'avg_points_completed'];
-  public displayedColumns2: string[] = ['date','title'];
+  public displayedColumns2: string[] = ['date','title','weight'];
   public posts = [];
   public selectedDateFrom = new Date("2013/01/01");
   public newDateFrom = new Date();
@@ -174,7 +174,7 @@ export class DiaryCalendar {
       this.top10 = result.data;
     });
     this.loadHighlights();
-    console.log("Gavno");
+    
   }
 
   loadHighlights() {

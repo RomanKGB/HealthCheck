@@ -237,7 +237,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
     try {
       this.entryid = this.activatedRoute.snapshot.paramMap.get('entryid').toString();
-      console.log("Get it here:" + this.activatedRoute.snapshot.paramMap.get('entryid').toString());
+      //console.log("Get it here:" + this.activatedRoute.snapshot.paramMap.get('entryid').toString());
     }
     catch { }
     if (this.entryid) {
@@ -333,12 +333,12 @@ export class DiaryEntryComponent extends BaseFormComponent{
     //console.log(this.form.get("activities_list"));
     var activitiesToAdd = "";
     this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
-    console.log("--"+this.setDone);
     this.searchVal = "";
+    //this.searchValLocal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();
-      console.log(this.searchValLocal);
+      console.log("---onAddToTodayClick" + this.searchVal);
       this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
@@ -360,7 +360,8 @@ export class DiaryEntryComponent extends BaseFormComponent{
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();
-      console.log(this.searchValLocal);
+      console.log("autoAdd---" + this.searchVal);
+      //this.searchValLocal = "";
       this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
