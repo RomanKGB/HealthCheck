@@ -330,15 +330,16 @@ export class DiaryEntryComponent extends BaseFormComponent{
   }
 
   onAddToTodayClick(event: Event) {
-    //console.log(this.form.get("activities_list"));
+    var isDone: number;
+    isDone = (this.setDone ? 1 : 0);
     var activitiesToAdd = "";
     this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
     this.searchVal = "";
     //this.searchValLocal = "";
-    this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
+    this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd, isDone).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();
-      console.log("---onAddToTodayClick" + this.searchVal);
+      //console.log("---onAddToTodayClick" + this.searchVal);
       this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
@@ -353,19 +354,21 @@ export class DiaryEntryComponent extends BaseFormComponent{
   }
 
   autoAdd() {
+    var isDone: number;
+    isDone = (this.setDone ? 1 : 0);
     var activitiesToAdd = "";
     this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
-
+    console.log(this.setDone);
     this.searchVal = "";
-    this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd).subscribe(result => {
+    this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd, isDone).subscribe(result => {
       this.loadEntryActivities();
       this.loadActivities();
-      console.log("autoAdd---" + this.searchVal);
+      //console.log("autoAdd---" + this.searchVal);
       //this.searchValLocal = "";
       this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
       this.user_message = "Activity added to entry...";
     }, error => console.error(error));
-    console.log("-->"+this.setDone);
+    
     if (this.setDone) {
       this.diaryService.markDone(parseInt(this.entryid), activitiesToAdd, 1).subscribe(result => {
         this.loadEntryActivities();

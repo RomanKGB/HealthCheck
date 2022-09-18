@@ -54,8 +54,8 @@ export class DiaryService extends BaseService {
     return this.http.post<City>(url, item);
   }
 
-  addActivityToEntry(entry_id: number, activity_id: string): Observable<boolean>  {
-    var url = this.baseUrl + "api/diary/addactivity?entry_id=" + entry_id + "&activity_id=" + activity_id;
+  addActivityToEntry(entry_id: number, activity_id: string, is_done: number): Observable<boolean>  {
+    var url = this.baseUrl + "api/diary/addactivity?entry_id=" + entry_id + "&activity_id=" + activity_id + "&is_done=" + is_done;
     return this.http.post<boolean>(url, null);
      
   }

@@ -262,7 +262,7 @@ namespace HealthCheck.Controllers
 
         [HttpPost]
         [Route("addactivity")]
-        public async Task<ActionResult<bool>> AddActivity(int entry_id,string activity_id)
+        public async Task<ActionResult<bool>> AddActivity(int entry_id,string activity_id,int is_done)
         {
             return await Task.Run(() =>
             {
@@ -272,7 +272,7 @@ namespace HealthCheck.Controllers
 
                 for (int i = 0; i < arrVariables.Length-1; i++)
                 {
-                    strSQL = "insert into diary_activities (activity_id,entry_id,done) values (" + arrVariables[i] + "," + entry_id + ",1)";
+                    strSQL = "insert into diary_activities (activity_id,entry_id,done) values (" + arrVariables[i] + "," + entry_id + ","+ is_done+")";
                     allok= dbLayer.ExecuteSQL(strSQL);
                 }
                 return allok; 
