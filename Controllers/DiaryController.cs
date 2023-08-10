@@ -120,18 +120,20 @@ namespace HealthCheck.Controllers
                 //    + "convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "')";
 
                 string strSQL = "select d.entry_id,d.entry_text,isnull(SUM(case da.done when 1 then a.activity_points else 0 end),0) as days_points,"
-                + "isnull(sum(case when a.activity_points>0 then a.activity_points else 0 end), 0) as days_planned_points,isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,isnull(count(da.activity_id),0) as num_activities,dbo.fnFormatDate (d.entry_date, 'YYYY-MM-DD') as entry_date,d.entry_date_int "
+                + "isnull(sum(case when a.activity_points>0 then a.activity_points else 0 end), 0) as days_planned_points,isnull(sum(case da.done when 1 then 1 else 0 end),0) as done_activities,"
+                + "isnull(count(da.activity_id),0) as num_activities,dbo.fnFormatDate (d.entry_date, 'YYYY-MM-DD') as entry_date,d.entry_date_int,d.my_weight "
                 + "from vDiary d left outer join diary_activities da on d.entry_id=da.entry_id "
                 + "left outer join activity a on a.activity_id = da.activity_id where convert(date, entry_date) between convert(date, '" + dateFrom + "') and convert(date, '" + dateTo + "') "
-                + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int";
+                + "group by d.entry_id,d.entry_text,d.entry_date,d.entry_date_int,d.my_weight";
 
                 DataTable dbTable = dbLayer.ExecuteQuery(strSQL);
                 List<DiaryEntryCalendar> diaryList = new List<DiaryEntryCalendar>();
                 diaryList = (from DataRow dr in dbTable.Rows
                              select new DiaryEntryCalendar()
                              {
-                                 title = dr["days_points"].ToString()+"/"+ dr["days_planned_points"].ToString()+"  -  "+dr["done_activities"].ToString() + "/" + dr["num_activities"].ToString(),
-                                 date = dr["entry_date"].ToString(),
+//                                 title = dr["days_points"].ToString()+"/"+ dr["days_planned_points"].ToString()+"  -  "+dr["done_activities"].ToString() + "/" + dr["num_activities"].ToString(),
+                                 title = dr["days_points"].ToString() + "/" + dr["days_planned_points"].ToString() + "  -  " + dr["my_weight"].ToString(),
+                                date = dr["entry_date"].ToString(),
                                  backgroundColor = getColor(dr["days_points"].ToString(),"event"),
                                  textColor= getColor(dr["days_points"].ToString(), "text"),
                                  id= dr["entry_id"].ToString()

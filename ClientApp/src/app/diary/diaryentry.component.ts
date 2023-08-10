@@ -96,7 +96,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     if (!listOfNames) return null;
     if (!nameToFilter) return listOfNames;
 
-    return listOfNames.filter(n => n.activity_name.toUpperCase().indexOf(nameToFilter.toUpperCase()) >= 0);
+    return listOfNames.filter(n => n.activity_name.toUpperCase().indexOf(nameToFilter.toUpperCase()) == 0);
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
@@ -148,7 +148,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     //  this.selection.clear();
     //  this.user_message = "Selected actitvities deleted...";
     //}, error => console.error(error));
-    console.log(selected_activities_local);
+    //console.log(selected_activities_local);
 
     var newDate = this.addDays(2, this.display_date);
 
@@ -159,6 +159,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
       this.diaryService.copyActivitiesToEntry(next_day_entry_id, selected_activities_local).subscribe(result => {
         //copy activities then navigate
         const currentUrl = this.router.url;
+        this.updateComment();
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
           this.router.navigate(['/diaryentry', next_day_entry_id]);
         });
