@@ -269,11 +269,11 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   colorCell(entry_color: number) {
 
-    if (entry_color >= 230) return "#8A39E1";
-    if (entry_color >= 150) return "blue";
-    if (entry_color >= 139) return "green";
-    if (entry_color >= 129) return "yellow";
-    if (entry_color >= 119) return "orange";
+    if (entry_color >= 250) return "#8A39E1";
+    if (entry_color >= 180) return "blue";
+    if (entry_color >= 169) return "green";
+    if (entry_color >= 149) return "yellow";
+    if (entry_color >= 129) return "orange";
     else return "red";
 
 
@@ -281,7 +281,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   colorCellFront(entry_color: number) {
 
-    if (entry_color >= 129 && entry_color < 139) return "blue";
+    if (entry_color >= 129 && entry_color < 169) return "blue";
     else return "white";
 
 

@@ -28,5 +28,7 @@ namespace HealthCheck.Data.Models
         public int weight { get; set; }
         public string highlight { get; set; }
 
+        public string days_points { get; set; }
+
     }
 }

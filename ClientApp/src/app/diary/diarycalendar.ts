@@ -5,5 +5,6 @@ export interface DiaryEntryCalendar {
   backgroundColor: string,
   textColor:string,
   weight: number,
-  highlight:string
+  highlight: string,
+  num_points:number
 }

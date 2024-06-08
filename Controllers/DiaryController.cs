@@ -173,7 +173,8 @@ namespace HealthCheck.Controllers
                                  backgroundColor = getColor(dr["days_points"].ToString(),"event"),
                                  textColor= getColor(dr["days_points"].ToString(), "text"),
                                  id = dr["entry_id"].ToString(),
-                                 weight= int.Parse(dr["my_weight"].ToString())
+                                 weight= int.Parse(dr["my_weight"].ToString()),
+                                 days_points = dr["days_points"].ToString()
                              }).ToList();
 
                 return new ApiResult<DiaryEntryCalendar>(diaryList, diaryList.Count, 1, 1, "", "", null, null);
@@ -436,17 +437,17 @@ namespace HealthCheck.Controllers
 
             switch(color_type)
             { case "event":
-                    if (days_points >= 230) return "#8A39E1";
-                    if (days_points >= 150) return "blue";
-                    if (days_points >= 139) return "green";
-                    if (days_points >= 129) return "yellow";
-                    if (days_points >= 119) return "orange";
+                    if (days_points >= 250) return "#8A39E1";
+                    if (days_points >= 180) return "blue";
+                    if (days_points >= 169) return "green";
+                    if (days_points >= 149) return "yellow";
+                    if (days_points >= 129) return "orange";
                     else return "red";
                 default:
-                    if (days_points >= 129 && days_points < 139) return "blue";
+                    if (days_points >= 129 && days_points < 169) return "blue";
                     else return "#ffffff";
             }
-
+            
         }
 
     }

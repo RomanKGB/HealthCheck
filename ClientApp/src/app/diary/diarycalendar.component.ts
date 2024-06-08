@@ -30,7 +30,7 @@ export class DiaryCalendar {
   public http: HttpClient;
   public baseUrl: string; private
   public displayedColumns: string[] = ['diary_month', 'diary_year', 'avg_points_completed'];
-  public displayedColumns2: string[] = ['date','title','weight'];
+  public displayedColumns2: string[] = ['date', 'title', 'weight','days_points'];
   public posts = [];
   public selectedDateFrom = new Date("2013/01/01");
   public newDateFrom = new Date();
@@ -66,9 +66,10 @@ export class DiaryCalendar {
 
   getRecord(rowObj) {
     this.calendarObj.getApi().gotoDate(new Date(rowObj.diary_month + "/1/" + rowObj.diary_year));
-    this.highlightsMonth = rowObj.diary_month;
-    this.highlightsYear = rowObj.diary_year;
-    this.loadHighlights();
+    this.highlightsMonth = new Date(rowObj.diary_month + "/1/" + rowObj.diary_year).getMonth().toString();
+    this.highlightsYear = new Date(rowObj.diary_month + "/1/" + rowObj.diary_year).getFullYear().toString();
+    
+    this.loadHighlights(this.highlightsMonth, this.highlightsYear);
   }
 
   getRecordEntry(rowObj) {
@@ -76,6 +77,7 @@ export class DiaryCalendar {
   }
 
   onSelectDate(event) {
+    
     this.selectedDateFrom = event;
     const dateString = event.toDateString();
     this.currentMonth = new Date(dateString).getMonth.toString();
@@ -88,8 +90,8 @@ export class DiaryCalendar {
     this.calendarObj.getApi().gotoDate(this.selectedDateFrom);
     this.currentMonth = (this.selectedDateFrom.getMonth()+1).toString();
     this.currentYear = this.selectedDateFrom.getFullYear().toString();
-
-    this.loadHighlights();
+    
+    this.loadHighlights(this.currentMonth, this.currentYear);
     this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
       this.top10 = result.data;
     });
@@ -173,19 +175,19 @@ export class DiaryCalendar {
     this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
       this.top10 = result.data;
     });
-    this.loadHighlights();
+    this.loadHighlights(this.currentMonth, this.currentYear);
     
   }
 
-  loadHighlights() {
+  loadHighlights(month_to_use:string,year_to_use:string) {
     var url = this.baseUrl + 'api/diary/getmonthhighlights';
     var params = new HttpParams()
-      //.set("month", this.highlightsMonth)
-      //.set("year", this.highlightsYear);
-      .set("month", this.currentMonth)
-      .set("year", this.currentYear);
+      .set("month", month_to_use)
+      .set("year", year_to_use);
+      //.set("month", this.currentMonth)
+      //.set("year", this.currentYear);
 
-    console.log("Load current month:" + this.currentMonth);
+    //console.log("Load current month:" + this.currentMonth);
     this.http.get<ApiResult<DiaryEntryCalendar>>(url, { params })
       .subscribe(result => {
         this.month_highlights = result.data;
@@ -198,10 +200,10 @@ export class DiaryCalendar {
   nextMonth(): void {
     this.currentYear = (parseInt(this.currentMonth) == 12 ? (parseInt(this.currentYear) + 1).toString(): this.currentYear);
     this.currentMonth = (parseInt(this.currentMonth) == 12 ? 1 : parseInt(this.currentMonth) + 1).toString();
-    console.log("Next current month:" + this.currentMonth);
-    console.log("Next current year:" + this.currentYear);
+    //console.log("Next current month:" + this.currentMonth);
+    //console.log("Next current year:" + this.currentYear);
     this.calendarObj.getApi().next();
-    this.loadHighlights();
+    this.loadHighlights(this.currentMonth, this.currentYear);
     this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
       this.top10 = result.data;
     });
@@ -210,10 +212,10 @@ export class DiaryCalendar {
   prevMonth(): void {
     this.currentYear = (parseInt(this.currentMonth) == 12 ? (parseInt(this.currentYear) - 1).toString() : this.currentYear);
     this.currentMonth = (parseInt(this.currentMonth) == 1 ? 12 : parseInt(this.currentMonth) - 1).toString();
-    console.log("Prev current month:" + this.currentMonth);
-    console.log("Prev current year:" + this.currentYear);
+    //console.log("Prev current month:" + this.currentMonth);
+    //console.log("Prev current year:" + this.currentYear);
     this.calendarObj.getApi().prev();
-    this.loadHighlights();
+    this.loadHighlights(this.currentMonth, this.currentYear);
     this.diaryService.getTop10Months<ApiResult<Top10Months>>(this.currentMonth, this.currentYear).subscribe(result => {
       this.top10 = result.data;
     });
