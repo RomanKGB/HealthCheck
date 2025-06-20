@@ -88,7 +88,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   onSearchChange(searchValue: string) {
     //console.log(searchValue);
-    this.activitiesList = this.filterList(this.activitiesListMaster, searchValue);
+    this.activitiesList = this.filterList(this.activitiesListMaster, searchValue).slice(0,20);
     this.searchValLocal = searchValue;
   }
 
@@ -120,7 +120,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
   loadActivities() {
     this.diaryService.getActivities<ApiResult<Activity>>(this.entryid).subscribe(result => {
       this.activitiesListMaster = result.data;
-      this.activitiesList = (this.searchValLocal == "" ? this.activitiesListMaster:this.filterList(this.activitiesListMaster, this.searchValLocal));
+      this.activitiesList = (this.searchValLocal == "" ? this.activitiesListMaster.slice(0, 20) : this.filterList(this.activitiesListMaster, this.searchValLocal).slice(0, 20));
     });
   }
 
@@ -269,6 +269,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
 
   colorCell(entry_color: number) {
 
+    if (entry_color >= 300) return "#000000";
     if (entry_color >= 250) return "#8A39E1";
     if (entry_color >= 180) return "blue";
     if (entry_color >= 169) return "green";
@@ -339,6 +340,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     //this.searchValLocal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd, isDone).subscribe(result => {
       this.loadEntryActivities();
+      this.searchValLocal = "";
       this.loadActivities();
       //console.log("---onAddToTodayClick" + this.searchVal);
       this.activitiesList = this.filterList(this.activitiesListMaster, this.searchValLocal);
@@ -359,7 +361,7 @@ export class DiaryEntryComponent extends BaseFormComponent{
     isDone = (this.setDone ? 1 : 0);
     var activitiesToAdd = "";
     this.selected_activites.map(o => { activitiesToAdd += o.value + "," });
-    console.log(this.setDone);
+    //console.log(this.setDone);
     this.searchVal = "";
     this.diaryService.addActivityToEntry(parseInt(this.entryid), activitiesToAdd, isDone).subscribe(result => {
       this.loadEntryActivities();
@@ -374,6 +376,8 @@ export class DiaryEntryComponent extends BaseFormComponent{
       this.diaryService.markDone(parseInt(this.entryid), activitiesToAdd, 1).subscribe(result => {
         this.loadEntryActivities();
         this.selection.clear();
+        this.searchValLocal = "";
+        this.loadActivities();
         this.user_message = "Auto done set...";
       }, error => console.error(error));
     }

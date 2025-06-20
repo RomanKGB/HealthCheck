@@ -231,7 +231,8 @@ namespace HealthCheck.Controllers
                                 {
                                     diary_month= dr["diary_month"].ToString(),
                                     diary_year= dr["diary_year"].ToString(),
-                                    avg_points_completed=int.Parse(dr["avg_points_completed"].ToString())
+                                    avg_points_completed=int.Parse(dr["avg_points_completed"].ToString()),
+                                    average_weight = int.Parse(dr["average_weight"].ToString())
                                 }).ToList();
 
                 return new ApiResult<Top10Months>(activityList, activityList.Count, 1, 100, null, null, null, null);
@@ -437,6 +438,7 @@ namespace HealthCheck.Controllers
 
             switch(color_type)
             { case "event":
+                    if (days_points >= 300) return "#000000";
                     if (days_points >= 250) return "#8A39E1";
                     if (days_points >= 180) return "blue";
                     if (days_points >= 169) return "green";
@@ -444,12 +446,14 @@ namespace HealthCheck.Controllers
                     if (days_points >= 129) return "orange";
                     else return "red";
                 default:
-                    if (days_points >= 129 && days_points < 169) return "blue";
+                    if (days_points >= 149 && days_points < 169) return "blue";
+                    if (days_points >= 129 && days_points < 300) return "#ffffff";
                     else return "#ffffff";
             }
             
         }
 
+        
     }
 }
 

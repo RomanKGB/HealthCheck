@@ -29,8 +29,8 @@ import { DiaryService } from './diaryservice';
 export class DiaryCalendar {
   public http: HttpClient;
   public baseUrl: string; private
-  public displayedColumns: string[] = ['diary_month', 'diary_year', 'avg_points_completed'];
-  public displayedColumns2: string[] = ['date', 'title', 'weight','days_points'];
+  public displayedColumns: string[] = ['diary_month', 'diary_year', 'average_weight','avg_points_completed'];
+  public displayedColumns2: string[] = ['date', 'title', 'days_points','weight'];
   public posts = [];
   public selectedDateFrom = new Date("2013/01/01");
   public newDateFrom = new Date();
@@ -143,6 +143,10 @@ export class DiaryCalendar {
   
   }
 
+  goToToday() {
+    this.router.navigate(['/calendar']);
+  }
+
   handleEventClick(clickInfo: EventClickArg) {
     /*this.dlg.open(DiaryEntryComponent, {
       data: { id: clickInfo.event.id, title: clickInfo.event.title, date: clickInfo.event.start, color: clickInfo.event.backgroundColor },
@@ -231,6 +235,7 @@ export class DiaryCalendar {
 
     this.http.get<ApiResult<DiaryEntryCalendar>>(url, { params })
       .subscribe(result => {
+        console.log(result.data);
         this.calendarOptions = {
           headerToolbar: {
             left: 'prev,next today',

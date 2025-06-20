@@ -9,6 +9,7 @@ export interface DiaryEntry {
 export interface Top10Months {
   diary_month: string,
   diary_year: string,
-  avg_points_completed:number
+  avg_points_completed: number
+  average_weight:number
 }
 

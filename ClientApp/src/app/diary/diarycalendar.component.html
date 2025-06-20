@@ -27,7 +27,12 @@
             {{top10item.avg_points_completed}}
           </td>
         </ng-container>
-
+        <ng-container matColumnDef="average_weight">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>W</th>
+          <td mat-cell *matCellDef="let top10item">
+            {{top10item.average_weight}}
+          </td>
+        </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns:displayedColumns;" (click)="getRecord(row)" style="cursor:pointer"></tr>
       </table>
@@ -46,14 +51,15 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Text</th>
           <td mat-cell *matCellDef="let month_highlightsitem" valign="top">{{month_highlightsitem.title}}</td>
         </ng-container>
-        <ng-container matColumnDef="weight">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Weight</th>
-          <td mat-cell *matCellDef="let month_highlightsitem" valign="top">{{month_highlightsitem.weight}}</td>
-        </ng-container>
         <ng-container matColumnDef="days_points">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Points</th>
           <td mat-cell *matCellDef="let month_highlightsitem" valign="top">{{month_highlightsitem.days_points}}</td>
         </ng-container>
+        <ng-container matColumnDef="weight">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Weight</th>
+          <td mat-cell *matCellDef="let month_highlightsitem" valign="top">{{month_highlightsitem.weight}}</td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
         <tr mat-row *matRowDef="let row; columns:displayedColumns2;" (click)="getRecordEntry(row)"></tr>
       </table>
